@@ -1,4 +1,4 @@
-# Full Stack Todo App
+# Full Stack Instagram App
 
 This project contains a Flutter frontend, a Node.js backend, and beginner-friendly learning notes in `docs/`.
 
