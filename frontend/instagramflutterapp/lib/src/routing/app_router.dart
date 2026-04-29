@@ -8,6 +8,7 @@ import 'package:instagramflutterapp/src/features/auth/presentation/screens/forgo
 
 import 'package:instagramflutterapp/src/features/home/presentation/screens/home_page.dart';
 import 'package:instagramflutterapp/src/features/onboarding/presentation/screens/onboarding_page.dart';
+import 'package:instagramflutterapp/src/features/posts/presentation/screens/create_post_screen.dart';
 
 
 final GoRouter appRouter = GoRouter(
@@ -38,6 +39,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.home,
       name: 'home',
       builder: (context, state) => const HomePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.createPost,
+      name: 'createPost',
+      builder: (context, state) => const CreatePostScreen(),
     ),
   ],
 );

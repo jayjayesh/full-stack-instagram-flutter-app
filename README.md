@@ -1,6 +1,6 @@
 # Full Stack Instagram App
 
-This project contains a Flutter frontend, a Node.js backend, and beginner-friendly learning notes in `docs/`.
+This project contains a Flutter frontend, a NestJS backend, PostgreSQL/Prisma data layer, and beginner-friendly learning notes in `docs/`.
 
 ## Learning Path
 
@@ -12,6 +12,10 @@ This project contains a Flutter frontend, a Node.js backend, and beginner-friend
 - [Frontend Guide](docs/FRONTEND.md)
 - [Frontend Setup](docs/FRONTEND_SETUP.md)
 - [Frontend Architecture](docs/FRONTEND_ARCHITECTURE.md)
+- [Lesson Plan](docs/LESSON_PLAN.md)
+- [Setup](docs/SETUP.md)
+- [API Reference](docs/API.md)
+- [Architecture Notes](docs/ARCHITECTURE.md)
 
 ## Project Shape
 

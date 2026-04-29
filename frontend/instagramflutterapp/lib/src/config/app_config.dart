@@ -23,24 +23,36 @@ class AppConfig {
 
     dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          AppLogger.info('🌐 [DIO] REQUEST[${options.method}] => PATH: ${options.path}');
+        onRequest: (options, handler) async {
+          final tokenResult =
+              await SecureStorageService.instance.read('auth_token');
+          tokenResult.fold(
+            (_) {},
+            (token) {
+              if (token != null && token.isNotEmpty) {
+                options.headers['Authorization'] = 'Bearer $token';
+              }
+            },
+          );
+          AppLogger.info(
+              '🌐 [DIO] REQUEST[${options.method}] => PATH: ${options.path}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          AppLogger.info('✅ [DIO] RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
+          AppLogger.info(
+              '✅ [DIO] RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          AppLogger.error('❌ [DIO] ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
+          AppLogger.error(
+              '❌ [DIO] ERROR[${e.response?.statusCode}] => PATH: ${e.requestOptions.path}');
           return handler.next(e);
         },
       ),
     );
-
   }
 
   static String _getBaseUrl() {
-    return dotenv.get('API_BASE_URL', fallback: 'http://api.instagramflutterapp.com');
+    return dotenv.get('API_BASE_URL', fallback: 'http://localhost:3000/api');
   }
 }

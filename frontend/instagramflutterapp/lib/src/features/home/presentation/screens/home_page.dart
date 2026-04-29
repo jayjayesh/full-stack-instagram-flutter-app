@@ -2,7 +2,8 @@ import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
 
 import 'package:instagramflutterapp/src/features/auth/presentation/providers/session_provider.dart';
-
+import 'package:instagramflutterapp/src/features/posts/presentation/providers/posts_provider.dart';
+import 'package:instagramflutterapp/src/features/posts/presentation/widgets/post_card.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -15,44 +16,102 @@ class HomePage extends ConsumerWidget {
 
     final session = ref.watch(sessionProvider);
     final user = session.user;
+    final feed = ref.watch(feedProvider);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppTopBar(
-        title: 'home.home_title'.tr(),
+        title: 'Photo Feed',
+        actions: [
+          IconButton(
+            tooltip: 'Log out',
+            onPressed: () async {
+              await ref.read(sessionProvider.notifier).logout();
+              if (context.mounted) {
+                context.go(AppRoutes.login);
+              }
+            },
+            icon: const Icon(Icons.logout),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push(AppRoutes.createPost),
+        child: const Icon(Icons.add_a_photo_outlined),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Icon(
-                Icons.home_rounded,
-                                size: 60.0,
-                color: colorScheme.primary,
-              ),
-              SizedBox(height: AppSpacing.lg),
-              Text(
-                user?.name ?? user?.email ?? ('home.welcome_home'.tr()),
-                textAlign: TextAlign.center,
-                style: textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: colorScheme.onSurface,
-                  fontSize: 28.0,
-                ),
-              ),
-                            SizedBox(height: AppSpacing.md),
-              Text(
-                user?.email != null && user?.name != null ? user!.email : ('home.home_subtitle'.tr()),
-                textAlign: TextAlign.center,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: 14.0,
-                ),
-              ),
-                          ],
+        child: RefreshIndicator(
+          onRefresh: () => ref.read(feedProvider.notifier).loadFeed(),
+          child: Builder(
+            builder: (context) {
+              if (feed.isLoading && feed.posts.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (feed.error != null && feed.posts.isEmpty) {
+                return ListView(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  children: [
+                    Icon(Icons.cloud_off_outlined,
+                        size: 56, color: colorScheme.error),
+                    SizedBox(height: AppSpacing.md),
+                    Text(
+                      feed.error!,
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyLarge,
+                    ),
+                    SizedBox(height: AppSpacing.md),
+                    FilledButton.icon(
+                      onPressed: () =>
+                          ref.read(feedProvider.notifier).loadFeed(),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Try again'),
+                    ),
+                  ],
+                );
+              }
+
+              if (feed.posts.isEmpty) {
+                return ListView(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  children: [
+                    SizedBox(height: AppSpacing.xxxl),
+                    Icon(
+                      Icons.photo_camera_back_outlined,
+                      size: 64,
+                      color: colorScheme.primary,
+                    ),
+                    SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Welcome ${user?.name ?? user?.email ?? ''}',
+                      textAlign: TextAlign.center,
+                      style: textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'Upload your first photo to start the feed.',
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                    SizedBox(height: AppSpacing.lg),
+                    FilledButton.icon(
+                      onPressed: () => context.push(AppRoutes.createPost),
+                      icon: const Icon(Icons.add_a_photo_outlined),
+                      label: const Text('Upload photo'),
+                    ),
+                  ],
+                );
+              }
+
+              return ListView.builder(
+                itemCount: feed.posts.length,
+                itemBuilder: (context, index) {
+                  return PostCard(post: feed.posts[index]);
+                },
+              );
+            },
           ),
         ),
       ),

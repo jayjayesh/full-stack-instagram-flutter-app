@@ -22,11 +22,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   FutureEither<AppUser> login({
-    required String email, 
+    required String email,
     required String password,
   }) async {
     final result = await _authService.login(email: email, password: password);
-    
+
     return result.flatMap((userData) {
       if (userData == null) {
         return left(const ServerFailure('Login failed: User record not found'));
@@ -34,19 +34,19 @@ class AuthRepositoryImpl implements AuthRepository {
 
       final data = userData['user'] ?? userData;
       final user = AppUser(
-        id: data['id'].toString(), 
-        email: data['email'] ?? email, 
+        id: data['id'].toString(),
+        email: data['email'] ?? email,
         name: data['name'],
       );
-      
+
       return right(user);
     });
   }
 
   @override
   FutureEither<AppUser> signUp({
-    required String name, 
-    required String email, 
+    required String name,
+    required String email,
     required String password,
   }) async {
     final result = await _authService.signUp(
@@ -57,16 +57,17 @@ class AuthRepositoryImpl implements AuthRepository {
 
     return result.flatMap((userData) {
       if (userData == null) {
-        return left(const ServerFailure('Sign up failed: User record corrupted'));
+        return left(
+            const ServerFailure('Sign up failed: User record corrupted'));
       }
 
       final data = userData['user'] ?? userData;
       final user = AppUser(
-        id: data['id'].toString(), 
-        email: data['email'] ?? email, 
+        id: data['id'].toString(),
+        email: data['email'] ?? email,
         name: name,
       );
-      
+
       return right(user);
     });
   }
@@ -84,15 +85,16 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   FutureEither<AppUser?> checkAuthState() async {
     final result = await _authService.getCurrentUser();
-    
+
     return result.map((userData) {
       if (userData == null) return null;
+      final data = userData['user'] ?? userData;
 
       return AppUser(
-        id: userData['id'], 
-        email: userData['email'] ?? '', 
-        name: userData['name'],
-        photoUrl: userData['photoUrl'],
+        id: data['id'] ?? '',
+        email: data['email'] ?? '',
+        name: data['name'],
+        photoUrl: data['photoUrl'],
       );
     });
   }
