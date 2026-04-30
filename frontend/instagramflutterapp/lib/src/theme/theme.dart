@@ -240,7 +240,7 @@ ThemeData _buildTheme(ColorScheme colorScheme, AppColorsExtension customColors) 
     // Floating Action Button Theme
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimaryContainer,
+      foregroundColor: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),

@@ -21,7 +21,8 @@ class HomePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppTopBar(
-        title: 'Photo Feed',
+        title: 'Feed',
+        showBackButton: false,
         actions: [
           IconButton(
             tooltip: 'Log out',

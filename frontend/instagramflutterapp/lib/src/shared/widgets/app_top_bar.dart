@@ -11,6 +11,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.centerTitle = true,
     this.onPressed,
     this.isTransparent = false,
+    this.showBackButton = false,
   });
 
   final String title;
@@ -19,6 +20,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onPressed;
   final bool? centerTitle;
   final bool isTransparent;
+  final bool showBackButton;
 
   @override
   Widget build(BuildContext context) {
@@ -53,17 +55,19 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
           ),
       leadingWidth: 40,
-      leading: GestureDetector(
-        onTap: handleBack,
-        child: ColoredBox(
-          color: Colors.transparent,
-          child: Icon(
-            Icons.arrow_back,
-            color: theme.appBarTheme.iconTheme?.color ??
-                theme.colorScheme.onSurface,
-          ),
-        ),
-      ),
+      leading: showBackButton
+          ? GestureDetector(
+              onTap: handleBack,
+              child: ColoredBox(
+                color: Colors.transparent,
+                child: Icon(
+                  Icons.arrow_back,
+                  color: theme.appBarTheme.iconTheme?.color ??
+                      theme.colorScheme.onSurface,
+                ),
+              ),
+            )
+          : null,
       iconTheme: theme.appBarTheme.iconTheme,
       actions: actions ?? [],
     );
