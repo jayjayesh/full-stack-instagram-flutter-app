@@ -3,12 +3,12 @@
     "get_started": "Get Started"
   },
   "onboarding": {
-    "onboarding_title_1": "Your Journey,\nPerfectly Planned",
-    "onboarding_subtitle_1": "Effortlessly create and organize your\ndream trips. Start exploring now!",
-    "onboarding_title_2": "Discover\nFriends Nearby",
-    "onboarding_subtitle_2": "See where your friends are traveling and\nexplore the world together.",
-    "onboarding_title_3": "Stay Updated\nwith Top Places",
-    "onboarding_subtitle_3": "Find trending destinations and must-see attractions,\nall tailored to enhance your travel plans."
+    "onboarding_title_1": "Bienvenido a\nInstagram Clone App",
+    "onboarding_subtitle_1": "Crea tu cuenta, inicia sesion de forma segura\ny entra en la primera version de la app.",
+    "onboarding_title_2": "Explora un\nPhoto Feed",
+    "onboarding_subtitle_2": "Mira publicaciones de fotos de la comunidad en un feed\nlimpio y facil de recorrer, pensado para la experiencia.",
+    "onboarding_title_3": "Publica fotos\ncon texto",
+    "onboarding_subtitle_3": "Sube una foto, agrega una descripcion\ny comparte tu primera publicacion en segundos."
   },
   "home": {
     "home_title": "Home",

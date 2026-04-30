@@ -114,7 +114,7 @@ class _OnboardingView extends StatelessWidget {
                 bottom: AppSpacing.md,
               ),
               child: Text(
-                'FlutterInit.',
+                'Photo Feed',
                 style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onSurface,
