@@ -18,21 +18,33 @@ class _OnboardingPageState extends State<OnboardingPage> {
   void initState() {
     super.initState();
     _pageController = PageController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final cs = context.theme.colorScheme;
     _onboardingData = [
       {
         'title': 'onboarding.onboarding_title_1'.tr(),
         'subtitle': 'onboarding.onboarding_subtitle_1'.tr(),
-        'pageWidget': const FlutterLogo(size: 200),
+        'pageWidget':
+            Icon(Icons.bakery_dining_sharp, size: 200, color: cs.primary),
       },
       {
         'title': 'onboarding.onboarding_title_2'.tr(),
         'subtitle': 'onboarding.onboarding_subtitle_2'.tr(),
-        'pageWidget': const FlutterLogo(size: 200),
+        'pageWidget': Icon(
+          Icons.bakery_dining_sharp,
+          size: 200,
+          color: cs.primary,
+        ),
       },
       {
         'title': 'onboarding.onboarding_title_3'.tr(),
         'subtitle': 'onboarding.onboarding_subtitle_3'.tr(),
-        'pageWidget': const FlutterLogo(size: 200),
+        'pageWidget':
+            Icon(Icons.bakery_dining_sharp, size: 200, color: cs.primary),
       },
     ];
   }

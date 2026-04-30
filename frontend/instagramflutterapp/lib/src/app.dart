@@ -13,8 +13,8 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       title: 'Instagram Clone',
       debugShowCheckedModeBanner: false,
-      theme: buildLightTheme(primaryColorHex: '#000000'),
-      darkTheme: buildDarkTheme(primaryColorHex: '#000000'),
+      theme: buildLightTheme(primaryColorHex: '#DF8CBA'),
+      darkTheme: buildDarkTheme(primaryColorHex: '#DF8CBA'),
       themeMode: ThemeMode.system,
       routerConfig: appRouter,
       localizationsDelegates: context.localizationDelegates,
