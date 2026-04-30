@@ -1,8 +1,6 @@
 import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
-
 import 'package:instagramflutterapp/src/features/auth/presentation/providers/session_provider.dart';
-
 
 class SessionListenerWrapper extends ConsumerWidget {
   final Widget child;
@@ -14,9 +12,9 @@ class SessionListenerWrapper extends ConsumerWidget {
       if (next.status != SessionStatus.unknown) {
         FlutterNativeSplash.remove();
         if (next.status == SessionStatus.authenticated) {
-          context.go(AppRoutes.home);
+          appRouter.go(AppRoutes.home);
         } else if (next.status == SessionStatus.unauthenticated) {
-          context.go(AppRoutes.onboarding);
+          appRouter.go(AppRoutes.onboarding);
         }
       }
     });
