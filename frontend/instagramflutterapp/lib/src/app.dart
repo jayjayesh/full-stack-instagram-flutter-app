@@ -11,7 +11,7 @@ class App extends StatelessWidget {
 
   Widget _buildMaterialApp(BuildContext context) {
     return MaterialApp.router(
-      title: 'InstagramFlutterApp',
+      title: 'Instagram Clone',
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(primaryColorHex: '#000000'),
       darkTheme: buildDarkTheme(primaryColorHex: '#000000'),
