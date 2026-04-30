@@ -17,6 +17,20 @@ npm run seed
 npm run start:dev
 ```
 
+Then
+
+```
+cd backend
+npm run prisma:studio
+```
+
+That opens your database visually. You should find the seeded user:
+
+```
+student@example.com
+password123
+```
+
 Backend URLs:
 
 - Health check: `http://localhost:3000/health`
