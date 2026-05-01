@@ -83,7 +83,6 @@ class HomePage extends ConsumerWidget {
           child: Builder(
             builder: (context) {
               final profileSection = ProfileSection(
-                key: Key('${user?.id}'),
                 user: user,
                 postCount: myPosts.length,
                 totalLikes: totalLikes,
