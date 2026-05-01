@@ -125,7 +125,10 @@ class PostCard extends ConsumerWidget {
                     IconButton(
                       tooltip: 'Share',
                       onPressed: () => _share(context),
-                      icon: const Icon(Icons.ios_share_outlined),
+                      icon: const Icon(
+                        Icons.share,
+                        size: 18,
+                      ),
                     ),
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../utils/utils.dart';
@@ -9,6 +10,46 @@ class MediaService {
   static final MediaService instance = MediaService._();
 
   final ImagePicker _imagePicker = ImagePicker();
+  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+
+  Future<void> _ensureCameraPermission() async {
+    final status = await Permission.camera.request();
+    if (!status.isGranted) {
+      throw Exception('Camera permission denied');
+    }
+  }
+
+  Future<void> _ensureMicrophonePermission() async {
+    final status = await Permission.microphone.request();
+    if (!status.isGranted) {
+      throw Exception('Microphone permission denied');
+    }
+  }
+
+  Future<void> _ensureGalleryPermission({required bool forVideo}) async {
+    if (Platform.isIOS) {
+      final status = await Permission.photos.request();
+      if (!status.isGranted && !status.isLimited) {
+        throw Exception(
+            forVideo ? 'Videos permission denied' : 'Photos permission denied');
+      }
+      return;
+    }
+
+    if (!Platform.isAndroid) return;
+
+    final androidInfo = await _deviceInfo.androidInfo;
+    final sdkInt = androidInfo.version.sdkInt;
+    final permission = sdkInt >= 33
+        ? (forVideo ? Permission.videos : Permission.photos)
+        : Permission.storage;
+    final status = await permission.request();
+
+    if (!status.isGranted && !status.isLimited) {
+      throw Exception(
+          forVideo ? 'Videos permission denied' : 'Photos permission denied');
+    }
+  }
 
   /// Pick an image from gallery or camera.
   FutureEither<File?> pickImage({
@@ -18,19 +59,10 @@ class MediaService {
     int? imageQuality,
   }) async {
     return runTask(() async {
-      // Check permissions
       if (source == ImageSource.camera) {
-        final status = await Permission.camera.request();
-        if (!status.isGranted) {
-          throw Exception('Camera permission denied');
-        }
+        await _ensureCameraPermission();
       } else {
-        if (Platform.isAndroid || Platform.isIOS) {
-          final status = await Permission.photos.request();
-          if (!status.isGranted && !status.isLimited) {
-            throw Exception('Photos permission denied');
-          }
-        }
+        await _ensureGalleryPermission(forVideo: false);
       }
 
       final XFile? file = await _imagePicker.pickImage(
@@ -51,12 +83,7 @@ class MediaService {
     int? imageQuality,
   }) async {
     return runTask(() async {
-      if (Platform.isAndroid || Platform.isIOS) {
-        final status = await Permission.photos.request();
-        if (!status.isGranted && !status.isLimited) {
-          throw Exception('Photos permission denied');
-        }
-      }
+      await _ensureGalleryPermission(forVideo: false);
 
       final List<XFile> files = await _imagePicker.pickMultiImage(
         maxWidth: maxWidth,
@@ -75,17 +102,10 @@ class MediaService {
   }) async {
     return runTask(() async {
       if (source == ImageSource.camera) {
-        final status = await Permission.camera.request();
-        if (!status.isGranted) {
-          throw Exception('Camera permission denied');
-        }
+        await _ensureCameraPermission();
+        await _ensureMicrophonePermission();
       } else {
-        if (Platform.isAndroid || Platform.isIOS) {
-          final status = await Permission.photos.request();
-          if (!status.isGranted && !status.isLimited) {
-            throw Exception('Photos permission denied');
-          }
-        }
+        await _ensureGalleryPermission(forVideo: true);
       }
 
       final XFile? file = await _imagePicker.pickVideo(
@@ -96,5 +116,4 @@ class MediaService {
       return file != null ? File(file.path) : null;
     });
   }
-
 }
