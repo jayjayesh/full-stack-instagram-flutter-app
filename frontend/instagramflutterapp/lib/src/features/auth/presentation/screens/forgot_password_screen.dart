@@ -102,7 +102,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ),
                 SizedBox(height: AppSpacing.xxxl),
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => context.go(AppRoutes.login),
                   child: Text(
                     'auth.back_to_login'.tr(),
                     style: tt.labelLarge?.copyWith(

@@ -242,7 +242,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     ],
                   ),
                 InkWell(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => context.go(AppRoutes.login),
                   child: RichText(
                     text: TextSpan(
                       text: 'auth.already_have_account'.tr(),
