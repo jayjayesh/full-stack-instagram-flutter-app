@@ -68,7 +68,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     final cs = context.theme.colorScheme;
 
     return Scaffold(
-      appBar: const AppTopBar(title: 'New photo'),
+      appBar: const AppTopBar(title: 'New post'),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(AppSpacing.lg),
@@ -108,7 +108,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               enabled: !_isSaving,
               label: 'Caption',
               maxLines: 4,
-              prefixIcon: const Icon(Icons.short_text),
+              // prefixIcon: const Icon(Icons.short_text),
             ),
             SizedBox(height: AppSpacing.lg),
             FilledButton.icon(

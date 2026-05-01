@@ -1,6 +1,7 @@
+import 'package:instagramflutterapp/src/features/home/presentation/widgets/profile_section_card.dart';
 import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
-
+// import 'package:instagramflutterapp/src/features/auth/domain/entities/user.dart';
 import 'package:instagramflutterapp/src/features/auth/presentation/providers/session_provider.dart';
 import 'package:instagramflutterapp/src/features/posts/presentation/providers/posts_provider.dart';
 import 'package:instagramflutterapp/src/features/posts/presentation/widgets/post_card.dart';
@@ -17,6 +18,15 @@ class HomePage extends ConsumerWidget {
     final session = ref.watch(sessionProvider);
     final user = session.user;
     final feed = ref.watch(feedProvider);
+    final myPosts = feed.posts.where((post) => post.ownedByMe).toList();
+    final totalLikes = myPosts.fold<int>(
+      0,
+      (sum, post) => sum + post.likeCount,
+    );
+    final totalComments = myPosts.fold<int>(
+      0,
+      (sum, post) => sum + post.commentCount,
+    );
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -45,6 +55,13 @@ class HomePage extends ConsumerWidget {
           onRefresh: () => ref.read(feedProvider.notifier).loadFeed(),
           child: Builder(
             builder: (context) {
+              final profileSection = ProfileSection(
+                user: user,
+                postCount: myPosts.length,
+                totalLikes: totalLikes,
+                totalComments: totalComments,
+              );
+
               if (feed.isLoading && feed.posts.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
@@ -53,6 +70,8 @@ class HomePage extends ConsumerWidget {
                 return ListView(
                   padding: EdgeInsets.all(AppSpacing.xl),
                   children: [
+                    profileSection,
+                    SizedBox(height: AppSpacing.xl),
                     Icon(Icons.cloud_off_outlined,
                         size: 56, color: colorScheme.error),
                     SizedBox(height: AppSpacing.md),
@@ -76,6 +95,8 @@ class HomePage extends ConsumerWidget {
                 return ListView(
                   padding: EdgeInsets.all(AppSpacing.xl),
                   children: [
+                    profileSection,
+                    SizedBox(height: AppSpacing.xxxl),
                     SizedBox(height: AppSpacing.xxxl),
                     Icon(
                       Icons.photo_camera_back_outlined,
@@ -107,9 +128,20 @@ class HomePage extends ConsumerWidget {
               }
 
               return ListView.builder(
-                itemCount: feed.posts.length,
+                padding: EdgeInsets.all(AppSpacing.md),
+                itemCount: feed.posts.length + 1,
                 itemBuilder: (context, index) {
-                  return PostCard(post: feed.posts[index]);
+                  if (index == 0) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: AppSpacing.md),
+                      child: profileSection,
+                    );
+                  }
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: AppSpacing.md),
+                    child: PostCard(post: feed.posts[index - 1]),
+                  );
                 },
               );
             },
