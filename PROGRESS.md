@@ -14,7 +14,7 @@ The app uses:
 
 ## Current Status
 
-The project has a working full-stack foundation. The main learning focus is now moving from setup into user-facing Instagram clone features, UI polish, testing, and reliable daily development workflow.
+The project has a working full-stack foundation and now includes a more complete signed-in home experience. Recent work added a profile summary on the home page, improved logout UX, fixed feed state when switching accounts, and added a regression test around that session-change behavior.
 
 ## Completed So Far
 
@@ -51,21 +51,39 @@ The project has a working full-stack foundation. The main learning focus is now 
 
 ## Recent Work
 
-### 2026-05-01 - Home Page User Profile
+### 2026-05-01 - Home Profile, Logout UX, and Session-Aware Feed
 
-Goal:
+What changed:
 
-- Add user profile information to the home page.
+- Added a profile summary section to the home page so the signed-in user can see their name, handle, email, post count, like count, and comment count alongside the feed.
+- Improved the empty-feed and error states so the home screen still feels personalized even when there are no posts yet or the feed load fails.
+- Added a logout confirmation dialog and supporting translation updates for logout-related labels.
+- Fixed a session bug where feed data from one account could remain visible after logging out and signing in as a different user.
+- Added a focused Riverpod regression test to verify the feed clears and reloads for the next signed-in user.
+- Cleaned up a small unnecessary home-page item in the latest commit.
 
-Expected result:
+Files touched:
 
-- The home page should show a basic signed-in user profile area alongside the feed experience.
+- `frontend/instagramflutterapp/lib/src/features/home/presentation/screens/home_page.dart`
+- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`
+- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_stat_card.dart`
+- `frontend/instagramflutterapp/lib/src/features/posts/presentation/providers/posts_provider.dart`
+- `frontend/instagramflutterapp/lib/src/features/posts/presentation/screens/create_post_screen.dart`
+- `frontend/instagramflutterapp/lib/src/shared/widgets/app_text_field.dart`
+- `frontend/instagramflutterapp/lib/src/theme/theme.dart`
+- `frontend/instagramflutterapp/assets/translations/en.json`
+- `frontend/instagramflutterapp/assets/translations/es.json`
+- `frontend/instagramflutterapp/test/feed_provider_test.dart`
 
-Follow-up needed:
+Tests run:
 
-- Recheck the final UI on emulator/simulator.
-- Confirm the profile data comes from the correct auth/current-user source.
-- Add or update tests if the profile UI has stable widgets or providers.
+- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart`
+  Result: passed.
+- `cd frontend/instagramflutterapp && flutter analyze`
+  Result: completed with 3 info-level lints:
+  - `lib/src/shared/helpers/show_toast.dart:60`
+  - `lib/src/shared/helpers/show_toast.dart:66`
+  - `lib/src/theme/theme.dart:292`
 
 ## Known Issues And Watch Points
 
@@ -93,20 +111,28 @@ The correct API base URL depends on where the Flutter app is running:
 
 Some button, app bar, floating action button, and icon colors may come from Flutter Material 3 theme defaults. When UI colors look unexpected, check the app theme first.
 
+### Pending UI Verification
+
+The new profile section, logout confirmation flow, and session-switching feed behavior still need manual verification on an emulator or simulator to confirm the current-user data and stats look correct in real navigation flow.
+
+### Analyzer Notes
+
+`flutter analyze` currently reports 3 info-level issues:
+
+- `frontend/instagramflutterapp/lib/src/shared/helpers/show_toast.dart:60`
+- `frontend/instagramflutterapp/lib/src/shared/helpers/show_toast.dart:66`
+- `frontend/instagramflutterapp/lib/src/theme/theme.dart:292`
+
 ### Environment Files
 
 Do not commit real `.env` files. Keep example files like `.env.example` in Git, but keep local secrets out of Git.
 
 ## Next Recommended Steps
 
-1. Re-run the project from a clean restart using the README commands.
-2. Create a `RUNBOOK.md` with exact daily startup commands.
-3. Verify the home page profile UI on at least one emulator or simulator.
-4. Review the current auth/current-user state flow.
-5. Add profile edit support.
-6. Add profile image upload.
-7. Add focused Flutter tests for home/profile UI.
-8. Add backend tests for profile-related endpoints when those endpoints exist.
+1. Manually test the real auth flow on an emulator or simulator: login as user A, logout, login as user B, and confirm the home profile card and feed stats update to the new account.
+2. Add a widget test for the home page profile section and logout confirmation dialog so the recent UI work has direct test coverage beyond the provider-level regression test.
+3. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
+4. Continue the profile feature set with profile edit support and profile image upload after the current home/session flow is verified.
 
 ## Useful Commands
 
