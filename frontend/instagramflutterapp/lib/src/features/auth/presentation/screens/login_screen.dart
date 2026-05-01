@@ -15,6 +15,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   bool obscurePassword = true;
+  bool rememberMe = true;
   final showSocialMediaSignin = false;
 
   @override
@@ -146,8 +147,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 width: 20,
                                 height: 20,
                                 child: Checkbox(
-                                  value: true,
-                                  onChanged: (value) {},
+                                  value: rememberMe,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      rememberMe = value ?? false;
+                                    });
+                                  },
                                 ),
                               ),
                               Text(
