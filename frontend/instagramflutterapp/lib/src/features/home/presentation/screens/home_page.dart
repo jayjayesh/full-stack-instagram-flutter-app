@@ -9,6 +9,30 @@ import 'package:instagramflutterapp/src/features/posts/presentation/widgets/post
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
+  Future<bool> _confirmLogout(BuildContext context) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('auth.logout_title'.tr()),
+          content: Text('auth.logout_confirmation'.tr()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text('shared.cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('auth.logout'.tr()),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldLogout ?? false;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = context.theme;
@@ -35,8 +59,11 @@ class HomePage extends ConsumerWidget {
         showBackButton: false,
         actions: [
           IconButton(
-            tooltip: 'Log out',
+            tooltip: 'auth.logout'.tr(),
             onPressed: () async {
+              final shouldLogout = await _confirmLogout(context);
+              if (!shouldLogout) return;
+
               await ref.read(sessionProvider.notifier).logout();
               if (context.mounted) {
                 context.go(AppRoutes.login);
@@ -56,6 +83,7 @@ class HomePage extends ConsumerWidget {
           child: Builder(
             builder: (context) {
               final profileSection = ProfileSection(
+                key: Key('${user?.id}'),
                 user: user,
                 postCount: myPosts.length,
                 totalLikes: totalLikes,
