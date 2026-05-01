@@ -44,9 +44,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         return;
       }
 
+      final email = emailController.text.trim();
+
       ref.read(authControllerProvider.notifier).login(
             context: context,
-            email: emailController.text,
+            email: email,
             password: passwordController.text,
           );
     }
@@ -83,10 +85,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         label: 'auth.email'.tr(),
                         prefixIcon: const Icon(Icons.email_outlined),
                         validator: (v) {
-                          if (AppUtils.isBlank(v)) {
+                          final email = v?.trim();
+
+                          if (AppUtils.isBlank(email)) {
                             return 'auth.email_required'.tr();
                           }
-                          if (!AppUtils.isValidEmail(v!)) {
+                          if (!AppUtils.isValidEmail(email!)) {
                             return 'auth.email_invalid'.tr();
                           }
                           return null;

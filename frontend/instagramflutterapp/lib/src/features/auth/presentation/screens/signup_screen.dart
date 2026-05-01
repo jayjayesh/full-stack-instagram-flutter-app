@@ -51,10 +51,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         return;
       }
 
+      final name = nameController.text.trim();
+      final email = emailController.text.trim();
+
       ref.read(authControllerProvider.notifier).signUp(
             context: context,
-            name: nameController.text,
-            email: emailController.text,
+            name: name,
+            email: email,
             password: passwordController.text,
           );
     }
@@ -89,7 +92,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         enabled: !isLoading,
                         label: 'auth.name'.tr(),
                         prefixIcon: const Icon(Icons.person_outline),
-                        validator: (v) => AppUtils.isBlank(v)
+                        validator: (v) => AppUtils.isBlank(v?.trim())
                             ? 'auth.name_required'.tr()
                             : null,
                       ),
@@ -101,10 +104,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         label: 'auth.email'.tr(),
                         prefixIcon: const Icon(Icons.email_outlined),
                         validator: (v) {
-                          if (AppUtils.isBlank(v)) {
+                          final email = v?.trim();
+
+                          if (AppUtils.isBlank(email)) {
                             return 'auth.email_required'.tr();
                           }
-                          if (!AppUtils.isValidEmail(v!)) {
+                          if (!AppUtils.isValidEmail(email!)) {
                             return 'auth.email_invalid'.tr();
                           }
                           return null;
