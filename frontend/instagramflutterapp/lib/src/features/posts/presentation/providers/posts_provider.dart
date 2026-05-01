@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:instagramflutterapp/src/features/auth/presentation/providers/session_provider.dart';
 import 'package:instagramflutterapp/src/features/posts/data/repositories/posts_repository_impl.dart';
 import 'package:instagramflutterapp/src/features/posts/domain/entities/comment.dart';
 import 'package:instagramflutterapp/src/features/posts/domain/entities/post.dart';
@@ -11,8 +12,15 @@ final postsRepositoryProvider = Provider<PostsRepository>((ref) {
 });
 
 final feedProvider = StateNotifierProvider<FeedNotifier, FeedState>((ref) {
-  return FeedNotifier(repository: ref.read(postsRepositoryProvider))
-    ..loadFeed();
+  final userId =
+      ref.watch(sessionProvider.select((session) => session.user?.id));
+  final notifier = FeedNotifier(repository: ref.read(postsRepositoryProvider));
+
+  if (userId != null) {
+    notifier.loadFeed();
+  }
+
+  return notifier;
 });
 
 final commentsProvider =
