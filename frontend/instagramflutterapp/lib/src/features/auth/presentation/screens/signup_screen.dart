@@ -54,12 +54,22 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       final name = nameController.text.trim();
       final email = emailController.text.trim();
 
-      ref.read(authControllerProvider.notifier).signUp(
-            context: context,
+      final result = await ref.read(authControllerProvider.notifier).signUp(
             name: name,
             email: email,
             password: passwordController.text,
           );
+
+      if (!context.mounted) return;
+
+      result.fold(
+        (failure) => showToast(
+          context,
+          message: failure.message,
+          status: 'error',
+        ),
+        (user) => context.go(AppRoutes.home),
+      );
     }
 
     return Scaffold(

@@ -46,11 +46,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       final email = emailController.text.trim();
 
-      ref.read(authControllerProvider.notifier).login(
-            context: context,
+      final result = await ref.read(authControllerProvider.notifier).login(
             email: email,
             password: passwordController.text,
           );
+
+      if (!context.mounted) return;
+
+      result.fold(
+        (failure) => showToast(
+          context,
+          message: failure.message,
+          status: 'error',
+        ),
+        (user) => context.go(AppRoutes.home),
+      );
     }
 
     return Scaffold(

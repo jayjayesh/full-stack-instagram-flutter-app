@@ -42,10 +42,28 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
       final email = emailController.text.trim();
 
-      ref.read(authControllerProvider.notifier).forgotPassword(
-            context: context,
-            email: email,
+      final result =
+          await ref.read(authControllerProvider.notifier).forgotPassword(
+                email: email,
+              );
+
+      if (!context.mounted) return;
+
+      result.fold(
+        (failure) => showToast(
+          context,
+          message: failure.message,
+          status: 'error',
+        ),
+        (_) {
+          showToast(
+            context,
+            message: 'Password reset link sent successfully',
+            status: 'success',
           );
+          context.go(AppRoutes.login);
+        },
+      );
     }
 
     return Scaffold(
