@@ -103,8 +103,11 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                         contentPadding: EdgeInsets.zero,
                         leading: CircleAvatar(
                             child: Text(name.characters.first.toUpperCase())),
-                        title: Text(name,
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                        title: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         subtitle: Text(comment.text),
                         trailing: canDelete
                             ? IconButton(
@@ -142,7 +145,10 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                             height: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Icon(Icons.send),
+                        : const Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
                   ),
                 ],
               ),

@@ -1,17 +1,35 @@
 import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
 
-
 import 'package:instagramflutterapp/src/features/auth/presentation/providers/auth_provider.dart';
 
-class ForgotPasswordScreen extends ConsumerWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = GlobalKey<FormState>();
-    final emailController = TextEditingController();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
+}
 
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+  late GlobalKey<FormState> formKey;
+  late TextEditingController emailController;
+
+  @override
+  void initState() {
+    super.initState();
+    formKey = GlobalKey<FormState>();
+    emailController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isLoading = ref.watch(authControllerProvider);
 
     final cs = context.theme.colorScheme;
@@ -23,9 +41,9 @@ class ForgotPasswordScreen extends ConsumerWidget {
       }
 
       ref.read(authControllerProvider.notifier).forgotPassword(
-        context: context,
-        email: emailController.text,
-      );
+            context: context,
+            email: emailController.text,
+          );
     }
 
     return Scaffold(
@@ -40,7 +58,8 @@ class ForgotPasswordScreen extends ConsumerWidget {
                 SizedBox(height: AppSpacing.xl),
                 Text(
                   'auth.forgot_password_title'.tr(),
-                  style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style:
+                      tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: AppSpacing.sm),
                 Text(

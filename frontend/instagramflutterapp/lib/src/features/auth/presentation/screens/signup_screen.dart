@@ -1,22 +1,46 @@
 import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
 
-
 import 'package:instagramflutterapp/src/features/auth/presentation/providers/auth_provider.dart';
 
-class SignupScreen extends ConsumerWidget {
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
-    const obscurePassword = true;
-    const obscureConfirmPassword = true;
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
+}
 
+class _SignupScreenState extends ConsumerState<SignupScreen> {
+  late GlobalKey<FormState> formKey;
+  late TextEditingController nameController;
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  late TextEditingController confirmPasswordController;
+  bool obscurePassword = true;
+  bool obscureConfirmPassword = true;
+  final showSocialMediaSignin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    formKey = GlobalKey<FormState>();
+    nameController = TextEditingController();
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    confirmPasswordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isLoading = ref.watch(authControllerProvider);
 
     final cs = context.theme.colorScheme;
@@ -28,11 +52,11 @@ class SignupScreen extends ConsumerWidget {
       }
 
       ref.read(authControllerProvider.notifier).signUp(
-        context: context,
-        name: nameController.text, 
-        email: emailController.text, 
-        password: passwordController.text,
-      );
+            context: context,
+            name: nameController.text,
+            email: emailController.text,
+            password: passwordController.text,
+          );
     }
 
     return Scaffold(
@@ -46,7 +70,8 @@ class SignupScreen extends ConsumerWidget {
                 SizedBox(height: AppSpacing.xl),
                 Text(
                   'auth.create_account'.tr(),
-                  style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style:
+                      tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).animate().fadeIn().slideY(begin: 0.2),
                 SizedBox(height: AppSpacing.sm),
                 Text(
@@ -55,7 +80,6 @@ class SignupScreen extends ConsumerWidget {
                   style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                 ).animate().fadeIn().slideY(begin: 0.2),
                 SizedBox(height: AppSpacing.xxxl),
-                // Form Card
                 Form(
                   key: formKey,
                   child: Column(
@@ -65,7 +89,9 @@ class SignupScreen extends ConsumerWidget {
                         enabled: !isLoading,
                         label: 'auth.name'.tr(),
                         prefixIcon: const Icon(Icons.person_outline),
-                        validator: (v) => AppUtils.isBlank(v) ? 'auth.name_required'.tr() : null,
+                        validator: (v) => AppUtils.isBlank(v)
+                            ? 'auth.name_required'.tr()
+                            : null,
                       ),
                       SizedBox(height: AppSpacing.md),
                       AppTextField(
@@ -92,10 +118,18 @@ class SignupScreen extends ConsumerWidget {
                         obscureText: obscurePassword,
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
-                          icon: Icon(Icons.visibility),
-                          onPressed: () => null,
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
                         ),
-                         validator: (v) {
+                        validator: (v) {
                           if (AppUtils.isBlank(v)) {
                             return 'auth.password_required'.tr();
                           }
@@ -113,8 +147,16 @@ class SignupScreen extends ConsumerWidget {
                         obscureText: obscureConfirmPassword,
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
-                          icon: Icon(Icons.visibility),
-                          onPressed: () => null,
+                          icon: Icon(
+                            obscureConfirmPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              obscureConfirmPassword = !obscureConfirmPassword;
+                            });
+                          },
                         ),
                         validator: (v) {
                           if (AppUtils.isBlank(v)) {
@@ -138,71 +180,77 @@ class SignupScreen extends ConsumerWidget {
                   ),
                 ),
                 SizedBox(height: AppSpacing.xxxl),
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 20.0,
-                      children: [
-                        SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFFEA4335).withValues(alpha: 0.8),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
+                if (showSocialMediaSignin)
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 20,
+                        children: [
+                          SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFFEA4335)
+                                    .withValues(alpha: 0.8),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: AppBorders.button,
+                                ),
                               ),
+                              child: SvgPicture.asset(AppAssets.googleIcon),
                             ),
-                            child: SvgPicture.asset(AppAssets.googleIcon),
                           ),
-                        ),
-                        SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFF4285F4),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
+                          SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFF4285F4),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: AppBorders.button,
+                                ),
                               ),
+                              child: SvgPicture.asset(AppAssets.facebookIcon),
                             ),
-                            child: SvgPicture.asset(AppAssets.facebookIcon),
                           ),
-                        ),
-                        SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFF000000),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
+                          SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFF000000),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: AppBorders.button,
+                                ),
                               ),
+                              child: SvgPicture.asset(AppAssets.appleIcon),
                             ),
-                            child: SvgPicture.asset(AppAssets.appleIcon),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: AppSpacing.xl),
-                  ],
-                ),
+                        ],
+                      ),
+                      SizedBox(height: AppSpacing.xl),
+                    ],
+                  ),
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   child: RichText(
                     text: TextSpan(
                       text: 'auth.already_have_account'.tr(),
-                      style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                      style:
+                          tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                       children: [
                         TextSpan(
-                          text: 'auth.sign_up'.tr(),
+                          text: 'auth.sign_in'.tr(),
                           style: TextStyle(
                             color: cs.primary,
                             fontWeight: FontWeight.bold,

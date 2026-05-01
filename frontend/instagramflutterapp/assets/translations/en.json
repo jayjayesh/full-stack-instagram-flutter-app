@@ -42,6 +42,7 @@
     "or_continue_with": "Or Continue With Account",
     "forgot_password_title": "Forgot Password",
     "forgot_password_subtitle": "Enter your email address to receive a reset link\nand regain access to your account.",
+    "back_to_login": "Back to SignIn",
     "reset_link_sent": "Password reset link sent to your email."
   }
 }

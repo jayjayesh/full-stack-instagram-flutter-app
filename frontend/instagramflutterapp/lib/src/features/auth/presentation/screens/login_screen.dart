@@ -1,19 +1,39 @@
 import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
 
-
 import 'package:instagramflutterapp/src/features/auth/presentation/providers/auth_provider.dart';
 
-class LoginScreen extends ConsumerWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = GlobalKey<FormState>();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    const obscurePassword = true;
+  ConsumerState<ConsumerStatefulWidget> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  late GlobalKey<FormState> formKey;
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  bool obscurePassword = true;
+  final showSocialMediaSignin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    formKey = GlobalKey<FormState>();
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isLoading = ref.watch(authControllerProvider);
 
     final cs = context.theme.colorScheme;
@@ -25,10 +45,10 @@ class LoginScreen extends ConsumerWidget {
       }
 
       ref.read(authControllerProvider.notifier).login(
-        context: context, 
-        email: emailController.text, 
-        password: passwordController.text,
-      );
+            context: context,
+            email: emailController.text,
+            password: passwordController.text,
+          );
     }
 
     return Scaffold(
@@ -42,7 +62,8 @@ class LoginScreen extends ConsumerWidget {
                 SizedBox(height: AppSpacing.xl),
                 Text(
                   'auth.log_in'.tr(),
-                  style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style:
+                      tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: AppSpacing.sm),
                 Text(
@@ -79,10 +100,18 @@ class LoginScreen extends ConsumerWidget {
                         obscureText: obscurePassword,
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
-                          icon: Icon(Icons.visibility),
-                          onPressed: () => null,
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
                         ),
-                         validator: (v) {
+                        validator: (v) {
                           if (AppUtils.isBlank(v)) {
                             return 'auth.password_required'.tr();
                           }
@@ -97,11 +126,11 @@ class LoginScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
-                            spacing: 5.0,
+                            spacing: 5,
                             children: [
                               SizedBox(
-                                width: 20.0,
-                                height: 20.0,
+                                width: 20,
+                                height: 20,
                                 child: Checkbox(
                                   value: true,
                                   onChanged: (value) {},
@@ -109,7 +138,8 @@ class LoginScreen extends ConsumerWidget {
                               ),
                               Text(
                                 'auth.remember_me'.tr(),
-                                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                                style: tt.bodySmall
+                                    ?.copyWith(color: cs.onSurfaceVariant),
                               ),
                             ],
                           ),
@@ -141,62 +171,67 @@ class LoginScreen extends ConsumerWidget {
                   ),
                 ),
                 SizedBox(height: AppSpacing.xxxl),
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 20.0,
-                      children: [
-                        SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFFEA4335).withValues(alpha: 0.8),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
+                if (showSocialMediaSignin)
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 20,
+                        children: [
+                          SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFFEA4335)
+                                    .withValues(alpha: 0.8),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: AppBorders.button,
+                                ),
                               ),
+                              child: SvgPicture.asset(AppAssets.googleIcon),
                             ),
-                            child: SvgPicture.asset(AppAssets.googleIcon),
                           ),
-                        ),
-                        SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFF4285F4),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
+                          SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFF4285F4),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: AppBorders.button,
+                                ),
                               ),
+                              child: SvgPicture.asset(AppAssets.facebookIcon),
                             ),
-                            child: SvgPicture.asset(AppAssets.facebookIcon),
                           ),
-                        ),
-                        SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: const Color(0xFF000000),
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: AppBorders.button,
+                          SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFF000000),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: AppBorders.button,
+                                ),
                               ),
+                              child: SvgPicture.asset(AppAssets.appleIcon),
                             ),
-                            child: SvgPicture.asset(AppAssets.appleIcon),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: AppSpacing.xl),
-                  ],
-                ),
+                        ],
+                      ),
+                      SizedBox(height: AppSpacing.xl),
+                    ],
+                  ),
                 InkWell(
                   onTap: () {
                     context.push(AppRoutes.signup);
@@ -204,7 +239,8 @@ class LoginScreen extends ConsumerWidget {
                   child: RichText(
                     text: TextSpan(
                       text: 'auth.dont_have_account'.tr(),
-                      style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                      style:
+                          tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                       children: [
                         TextSpan(
                           text: 'auth.sign_up'.tr(),
