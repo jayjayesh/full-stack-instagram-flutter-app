@@ -108,6 +108,14 @@ class _FakeAuthRepository implements AuthRepository {
   }) async {
     throw UnimplementedError();
   }
+
+  @override
+  FutureEither<AppUser> updateProfile({
+    required String name,
+    File? photo,
+  }) async {
+    throw UnimplementedError();
+  }
 }
 
 class _FakePostsRepository implements PostsRepository {

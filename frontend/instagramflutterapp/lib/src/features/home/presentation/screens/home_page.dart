@@ -87,6 +87,7 @@ class HomePage extends ConsumerWidget {
                 postCount: myPosts.length,
                 totalLikes: totalLikes,
                 totalComments: totalComments,
+                onEditProfile: () => context.push(AppRoutes.editProfile),
               );
 
               if (feed.isLoading && feed.posts.isEmpty) {

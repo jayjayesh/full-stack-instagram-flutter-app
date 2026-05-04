@@ -1,5 +1,6 @@
 import 'package:instagramflutterapp/src/utils/utils.dart';
 import 'package:instagramflutterapp/src/features/auth/domain/entities/user.dart';
+import 'dart:io';
 
 abstract class AuthRepository {
   /// Stream of auth state changes. Emits AppUser when authenticated, null when not.
@@ -25,8 +26,13 @@ abstract class AuthRepository {
 
   /// Sign out the current user
   FutureEither<void> logout();
-  
+
   /// Check if the user is currently authenticated natively
   FutureEither<AppUser?> checkAuthState();
-}
 
+  /// Update the current user's profile details.
+  FutureEither<AppUser> updateProfile({
+    required String name,
+    File? photo,
+  });
+}

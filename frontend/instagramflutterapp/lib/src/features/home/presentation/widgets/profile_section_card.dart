@@ -10,12 +10,14 @@ class ProfileSection extends StatelessWidget {
     required this.postCount,
     required this.totalLikes,
     required this.totalComments,
+    required this.onEditProfile,
   });
 
   final AppUser? user;
   final int postCount;
   final int totalLikes;
   final int totalComments;
+  final VoidCallback onEditProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +60,8 @@ class ProfileSection extends StatelessWidget {
                   children: [
                     Text(
                       displayName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
@@ -65,6 +69,8 @@ class ProfileSection extends StatelessWidget {
                     SizedBox(height: AppSpacing.xxs),
                     Text(
                       '@$handle',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -72,6 +78,8 @@ class ProfileSection extends StatelessWidget {
                     SizedBox(height: AppSpacing.xxs),
                     Text(
                       user?.email ?? 'No email available',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -79,11 +87,17 @@ class ProfileSection extends StatelessWidget {
                   ],
                 ),
               ),
+              SizedBox(width: AppSpacing.sm),
+              OutlinedButton.icon(
+                onPressed: onEditProfile,
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                label: const Text('Edit'),
+              ),
             ],
           ),
           SizedBox(height: AppSpacing.lg),
           Text(
-            'Your activity summary',
+            'Your activity',
             style: textTheme.labelLarge?.copyWith(
               color: colorScheme.primary,
               fontWeight: FontWeight.w700,

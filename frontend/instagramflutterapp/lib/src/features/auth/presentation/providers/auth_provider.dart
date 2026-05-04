@@ -1,5 +1,6 @@
 import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
+import 'dart:io';
 
 import 'package:instagramflutterapp/src/features/auth/domain/entities/user.dart';
 import 'package:instagramflutterapp/src/features/auth/domain/repositories/auth_repository.dart';
@@ -55,6 +56,18 @@ class AuthController extends StateNotifier<bool> {
     state = true;
 
     final result = await _repository.forgotPassword(email: email);
+
+    state = false;
+    return result;
+  }
+
+  FutureEither<AppUser> updateProfile({
+    required String name,
+    File? photo,
+  }) async {
+    state = true;
+
+    final result = await _repository.updateProfile(name: name, photo: photo);
 
     state = false;
     return result;

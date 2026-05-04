@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -9,6 +10,7 @@ import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -61,6 +63,39 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User was not found.');
     }
+
+    return { user: this.toPublicUser(user) };
+  }
+
+  async updateProfile(
+    userId: string,
+    dto: UpdateProfileDto,
+    photoUrl?: string,
+  ) {
+    const hasNameUpdate = dto.name !== undefined;
+    const hasPhotoUpdate = photoUrl !== undefined;
+
+    if (!hasNameUpdate && !hasPhotoUpdate) {
+      throw new BadRequestException(
+        'Please change your name or choose a new profile photo.',
+      );
+    }
+
+    const existingUser = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!existingUser) {
+      throw new NotFoundException('User was not found.');
+    }
+
+    const nextName = dto.name?.trim() ?? '';
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: hasNameUpdate ? (nextName.length > 0 ? nextName : null) : undefined,
+        photoUrl,
+      },
+    });
 
     return { user: this.toPublicUser(user) };
   }

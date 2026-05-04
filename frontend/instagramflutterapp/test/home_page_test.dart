@@ -100,12 +100,18 @@ Future<void> _pumpHomePage(
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (_, __) => const Scaffold(body: Center(child: Text('Login route'))),
+        builder: (_, __) =>
+            const Scaffold(body: Center(child: Text('Login route'))),
       ),
       GoRoute(
         path: AppRoutes.createPost,
         builder: (_, __) =>
             const Scaffold(body: Center(child: Text('Create post route'))),
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (_, __) =>
+            const Scaffold(body: Center(child: Text('Edit profile route'))),
       ),
     ],
   );
@@ -164,7 +170,8 @@ class _TestFeedNotifier extends FeedNotifier {
 }
 
 class _StubAuthRepository implements AuthRepository {
-  _StubAuthRepository({required AppUser initialUser}) : _initialUser = initialUser;
+  _StubAuthRepository({required AppUser initialUser})
+      : _initialUser = initialUser;
 
   final AppUser _initialUser;
 
@@ -188,6 +195,14 @@ class _StubAuthRepository implements AuthRepository {
 
   @override
   FutureEither<void> logout() async => right(null);
+
+  @override
+  FutureEither<AppUser> updateProfile({
+    required String name,
+    File? photo,
+  }) async {
+    throw UnimplementedError();
+  }
 
   @override
   FutureEither<AppUser> signUp({

@@ -12,4 +12,5 @@ abstract final class AppRoutes {
   static const String signup = '/signup';
   static const String forgotPassword = '/forgot-password';
   static const String createPost = '/create-post';
+  static const String editProfile = '/edit-profile';
 }

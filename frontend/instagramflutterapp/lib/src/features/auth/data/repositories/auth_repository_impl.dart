@@ -1,5 +1,6 @@
 import 'package:instagramflutterapp/src/imports/core_imports.dart';
 import 'package:instagramflutterapp/src/imports/packages_imports.dart';
+import 'dart:io';
 
 import 'package:instagramflutterapp/src/features/auth/domain/entities/user.dart';
 import 'package:instagramflutterapp/src/features/auth/domain/repositories/auth_repository.dart';
@@ -37,6 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
         id: data['id'].toString(),
         email: data['email'] ?? email,
         name: data['name'],
+        photoUrl: data['photoUrl'],
       );
 
       return right(user);
@@ -65,7 +67,8 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = AppUser(
         id: data['id'].toString(),
         email: data['email'] ?? email,
-        name: name,
+        name: data['name'] ?? name,
+        photoUrl: data['photoUrl'],
       );
 
       return right(user);
@@ -95,6 +98,33 @@ class AuthRepositoryImpl implements AuthRepository {
         email: data['email'] ?? '',
         name: data['name'],
         photoUrl: data['photoUrl'],
+      );
+    });
+  }
+
+  @override
+  FutureEither<AppUser> updateProfile({
+    required String name,
+    File? photo,
+  }) async {
+    final result = await _authService.updateProfile(name: name, photo: photo);
+
+    return result.flatMap((userData) {
+      if (userData == null) {
+        return left(
+          const ServerFailure('Profile update failed: User record not found'),
+        );
+      }
+
+      final data = userData['user'] ?? userData;
+
+      return right(
+        AppUser(
+          id: data['id'] ?? '',
+          email: data['email'] ?? '',
+          name: data['name'],
+          photoUrl: data['photoUrl'],
+        ),
       );
     });
   }

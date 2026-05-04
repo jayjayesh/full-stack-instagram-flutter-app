@@ -14,7 +14,7 @@ The app uses:
 
 ## Current Status
 
-The project has a working full-stack foundation and now includes a more complete signed-in home experience with both manual verification and broader automated coverage. The recent auth/session and profile-card work has now been manually tested, and the home screen also has widget-test coverage for the profile summary and logout confirmation flow.
+The project has a working full-stack foundation and now includes profile editing support for the signed-in user. Users can open an edit-profile screen from the home profile card, change their display name, upload a new profile photo, and see the session and feed refresh after saving.
 
 ## Completed So Far
 
@@ -111,6 +111,54 @@ Tests run:
   - `lib/src/shared/helpers/show_toast.dart:66`
   - `lib/src/theme/theme.dart:292`
 
+### 2026-05-04 - Profile Editing and Profile Photo Upload
+
+What changed:
+
+- Added a backend `PATCH /api/auth/profile` endpoint for updating the signed-in user's display name and optional profile photo upload.
+- Reused local upload storage so profile photos are served through the existing `/uploads` path.
+- Extended the Flutter auth service, repository, and auth controller to support profile updates and refresh the in-memory signed-in user.
+- Added a new edit-profile screen where the user can choose a new gallery image and update their display name.
+- Added an edit action to the home profile card so the new screen is reachable from the signed-in home experience.
+- Refreshed the feed after a successful profile update so the user's posts pick up the latest name and photo without requiring a full sign-out/sign-in cycle.
+- Added translation strings for the new profile-editing flow.
+- Updated test doubles to match the new auth repository contract.
+
+Files touched:
+
+- `backend/src/auth/auth.controller.ts`
+- `backend/src/auth/auth.service.ts`
+- `backend/src/auth/dto/update-profile.dto.ts`
+- `frontend/instagramflutterapp/lib/src/services/auth_service.dart`
+- `frontend/instagramflutterapp/lib/src/features/auth/domain/repositories/auth_repository.dart`
+- `frontend/instagramflutterapp/lib/src/features/auth/data/repositories/auth_repository_impl.dart`
+- `frontend/instagramflutterapp/lib/src/features/auth/presentation/providers/auth_provider.dart`
+- `frontend/instagramflutterapp/lib/src/features/auth/presentation/screens/edit_profile_screen.dart`
+- `frontend/instagramflutterapp/lib/src/features/home/presentation/screens/home_page.dart`
+- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`
+- `frontend/instagramflutterapp/lib/src/routing/app_router.dart`
+- `frontend/instagramflutterapp/lib/src/routing/app_routes.dart`
+- `frontend/instagramflutterapp/lib/src/imports/core_imports.dart`
+- `frontend/instagramflutterapp/assets/translations/en.json`
+- `frontend/instagramflutterapp/assets/translations/es.json`
+- `frontend/instagramflutterapp/test/home_page_test.dart`
+- `frontend/instagramflutterapp/test/feed_provider_test.dart`
+- `PROGRESS.md`
+
+Tests run:
+
+- `cd frontend/instagramflutterapp && flutter test test/home_page_test.dart -r expanded`
+  Result: passed.
+- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart -r expanded`
+  Result: passed.
+- `cd frontend/instagramflutterapp && flutter analyze`
+  Result: completed with 3 existing info-level lints:
+  - `lib/src/shared/helpers/show_toast.dart:60`
+  - `lib/src/shared/helpers/show_toast.dart:66`
+  - `lib/src/theme/theme.dart:292`
+- `cd backend && npm run build`
+  Result: passed.
+
 ## Known Issues And Watch Points
 
 ### Media Permissions
@@ -151,9 +199,9 @@ Do not commit real `.env` files. Keep example files like `.env.example` in Git, 
 
 ## Next Recommended Steps
 
-1. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
-2. Consider broadening widget coverage for the personalized empty-feed and error states if you want stronger UI regression protection around the new home experience.
-3. Continue the profile feature set with profile edit support and profile image upload.
+1. Manually verify the new profile-edit flow on emulator or simulator, especially gallery permissions, image upload, and whether updated avatar/name appear correctly on existing posts after save.
+2. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
+3. Consider widget coverage for the new edit-profile screen once the manual flow is verified.
 
 ## Useful Commands
 

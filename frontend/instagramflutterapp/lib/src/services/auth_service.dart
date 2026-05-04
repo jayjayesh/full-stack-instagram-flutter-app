@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+
 import '../utils/utils.dart';
 import '../config/app_config.dart';
 import 'secure_storage_service.dart';
-import 'package:dio/dio.dart';
 
 class AuthService {
   AuthService._();
@@ -77,6 +80,35 @@ class AuthService {
       final response = await _dio.get<dynamic>('/auth/me');
       return response.data as Map<String, dynamic>;
     });
+  }
+
+  FutureEither<Map<String, dynamic>?> updateProfile({
+    required String name,
+    File? photo,
+  }) async {
+    return runTask(() async {
+      final formData = FormData.fromMap({
+        'name': name,
+        if (photo != null)
+          'photo': await MultipartFile.fromFile(
+            photo.path,
+            filename: photo.uri.pathSegments.isNotEmpty
+                ? photo.uri.pathSegments.last
+                : 'profile-photo.jpg',
+          ),
+      });
+
+      final response = await _dio.patch<dynamic>(
+        '/auth/profile',
+        data: formData,
+        options: Options(
+          headers: {'Content-Type': 'multipart/form-data'},
+        ),
+      );
+      final data = response.data as Map<String, dynamic>;
+      _authStateController.add(data['user'] as Map<String, dynamic>?);
+      return data;
+    }, requiresNetwork: true);
   }
 
   Future<void> _persistAuthResponse(Map<String, dynamic> data) async {
