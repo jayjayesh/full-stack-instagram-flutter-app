@@ -83,7 +83,7 @@ class ProfileSection extends StatelessWidget {
           ),
           SizedBox(height: AppSpacing.lg),
           Text(
-            'Your profile',
+            'Your activity summary',
             style: textTheme.labelLarge?.copyWith(
               color: colorScheme.primary,
               fontWeight: FontWeight.w700,
