@@ -51,6 +51,34 @@ The project has a working full-stack foundation and now includes profile editing
 
 ## Recent Work
 
+### 2026-05-04 - Progress Refresh and Current Verification Status
+
+What changed:
+
+- Refreshed this handoff note against the current repository state after the profile-edit work landed.
+- Re-ran the focused frontend checks and backend build to confirm the current verification status instead of relying only on the previous summary.
+- Found that the home-page widget test is now out of sync with the UI copy. The test still expects `Your activity summary`, while the widget currently renders `Your activity`.
+
+Files touched:
+
+- `PROGRESS.md`
+- `frontend/instagramflutterapp/test/home_page_test.dart`
+- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`
+
+Tests run:
+
+- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart -r expanded`
+  Result: passed.
+- `cd frontend/instagramflutterapp && flutter test test/home_page_test.dart -r expanded`
+  Result: failed. The test expected `Your activity summary`, but no matching widget was found.
+- `cd frontend/instagramflutterapp && flutter analyze`
+  Result: completed with 3 info-level lints:
+  - `lib/src/shared/helpers/show_toast.dart:60`
+  - `lib/src/shared/helpers/show_toast.dart:66`
+  - `lib/src/theme/theme.dart:292`
+- `cd backend && npm run build`
+  Result: passed.
+
 ### 2026-05-01 - Home Profile, Logout UX, and Session-Aware Feed
 
 What changed:
@@ -193,15 +221,20 @@ Some button, app bar, floating action button, and icon colors may come from Flut
 - `frontend/instagramflutterapp/lib/src/shared/helpers/show_toast.dart:66`
 - `frontend/instagramflutterapp/lib/src/theme/theme.dart:292`
 
+### Home Page Widget Test Drift
+
+`frontend/instagramflutterapp/test/home_page_test.dart` is currently failing because it still expects the text `Your activity summary`, but `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart` now renders `Your activity`.
+
 ### Environment Files
 
 Do not commit real `.env` files. Keep example files like `.env.example` in Git, but keep local secrets out of Git.
 
 ## Next Recommended Steps
 
-1. Manually verify the new profile-edit flow on emulator or simulator, especially gallery permissions, image upload, and whether updated avatar/name appear correctly on existing posts after save.
-2. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
-3. Consider widget coverage for the new edit-profile screen once the manual flow is verified.
+1. Fix the text mismatch between `frontend/instagramflutterapp/test/home_page_test.dart` and `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`, then rerun the focused Flutter tests.
+2. Manually verify the new profile-edit flow on emulator or simulator, especially gallery permissions, image upload, and whether updated avatar/name appear correctly on existing posts after save.
+3. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
+4. Consider widget coverage for the new edit-profile screen once the manual flow is verified.
 
 ## Useful Commands
 
