@@ -14,7 +14,7 @@ The app uses:
 
 ## Current Status
 
-The project has a working full-stack foundation and now includes a more complete signed-in home experience. Recent work added a profile summary on the home page, improved logout UX, fixed feed state when switching accounts, and added a regression test around that session-change behavior.
+The project has a working full-stack foundation and now includes a more complete signed-in home experience with both manual verification and broader automated coverage. The recent auth/session and profile-card work has now been manually tested, and the home screen also has widget-test coverage for the profile summary and logout confirmation flow.
 
 ## Completed So Far
 
@@ -85,6 +85,32 @@ Tests run:
   - `lib/src/shared/helpers/show_toast.dart:66`
   - `lib/src/theme/theme.dart:292`
 
+### 2026-05-04 - Manual Verification Complete and Home Widget Tests
+
+What changed:
+
+- Confirmed through manual testing that the auth/session flow works correctly when logging in, logging out, and switching accounts.
+- Confirmed the home profile card updates correctly in the real app flow.
+- Added widget tests for the home page profile summary content.
+- Added widget coverage for the logout confirmation dialog, including cancel and confirm behavior with navigation to the login route.
+
+Files touched:
+
+- `frontend/instagramflutterapp/test/home_page_test.dart`
+- `PROGRESS.md`
+
+Tests run:
+
+- `cd frontend/instagramflutterapp && flutter test test/home_page_test.dart`
+  Result: passed.
+- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart`
+  Result: passed.
+- `cd frontend/instagramflutterapp && flutter analyze`
+  Result: completed with 3 info-level lints:
+  - `lib/src/shared/helpers/show_toast.dart:60`
+  - `lib/src/shared/helpers/show_toast.dart:66`
+  - `lib/src/theme/theme.dart:292`
+
 ## Known Issues And Watch Points
 
 ### Media Permissions
@@ -111,10 +137,6 @@ The correct API base URL depends on where the Flutter app is running:
 
 Some button, app bar, floating action button, and icon colors may come from Flutter Material 3 theme defaults. When UI colors look unexpected, check the app theme first.
 
-### Pending UI Verification
-
-The new profile section, logout confirmation flow, and session-switching feed behavior still need manual verification on an emulator or simulator to confirm the current-user data and stats look correct in real navigation flow.
-
 ### Analyzer Notes
 
 `flutter analyze` currently reports 3 info-level issues:
@@ -129,10 +151,9 @@ Do not commit real `.env` files. Keep example files like `.env.example` in Git, 
 
 ## Next Recommended Steps
 
-1. Manually test the real auth flow on an emulator or simulator: login as user A, logout, login as user B, and confirm the home profile card and feed stats update to the new account.
-2. Add a widget test for the home page profile section and logout confirmation dialog so the recent UI work has direct test coverage beyond the provider-level regression test.
-3. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
-4. Continue the profile feature set with profile edit support and profile image upload after the current home/session flow is verified.
+1. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
+2. Consider broadening widget coverage for the personalized empty-feed and error states if you want stronger UI regression protection around the new home experience.
+3. Continue the profile feature set with profile edit support and profile image upload.
 
 ## Useful Commands
 
