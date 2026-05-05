@@ -50,7 +50,7 @@ void main() {
     expect(find.text('Jordan Lee'), findsOneWidget);
     expect(find.text('@jordan'), findsOneWidget);
     expect(find.text('jordan@example.com'), findsOneWidget);
-    expect(find.text('Your activity summary'), findsOneWidget);
+    expect(find.text('Your activity'), findsOneWidget);
     expect(
       find.text('Share your first moment to start building your profile.'),
       findsOneWidget,
