@@ -7,11 +7,16 @@ class StorageService {
   static final StorageService instance = StorageService._();
 
   late final SharedPreferences _prefs;
+  bool _isInitialized = false;
 
   /// Initialize SharedPreferences instance.
   FutureEither<void> init() async {
     return runTask(() async {
+      if (_isInitialized) {
+        return;
+      }
       _prefs = await SharedPreferences.getInstance();
+      _isInitialized = true;
       AppLogger.info('StorageService (SharedPreferences) initialized');
     });
   }

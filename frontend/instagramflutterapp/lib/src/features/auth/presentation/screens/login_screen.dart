@@ -11,6 +11,9 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  static const _rememberMeKey = 'auth_remember_me';
+  static const _rememberedEmailKey = 'auth_remembered_email';
+
   late GlobalKey<FormState> formKey;
   late TextEditingController emailController;
   late TextEditingController passwordController;
@@ -24,6 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     formKey = GlobalKey<FormState>();
     emailController = TextEditingController();
     passwordController = TextEditingController();
+    _loadRememberedLogin();
   }
 
   @override
@@ -31,6 +35,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadRememberedLogin() async {
+    await StorageService.instance.init();
+
+    final storedRememberMe =
+        StorageService.instance.getBool(_rememberMeKey) ?? rememberMe;
+    final storedEmail = storedRememberMe
+        ? StorageService.instance.getString(_rememberedEmailKey) ?? ''
+        : '';
+
+    if (!mounted) return;
+
+    setState(() {
+      rememberMe = storedRememberMe;
+      emailController.text = storedEmail;
+    });
+  }
+
+  Future<void> _persistRememberMePreference(bool value) async {
+    await StorageService.instance.init();
+    await StorageService.instance.setBool(_rememberMeKey, value);
+
+    if (!value) {
+      await StorageService.instance.remove(_rememberedEmailKey);
+    }
+  }
+
+  Future<void> _persistRememberedEmail(String email) async {
+    await StorageService.instance.init();
+
+    if (rememberMe && email.isNotEmpty) {
+      await StorageService.instance.setString(_rememberedEmailKey, email);
+      return;
+    }
+
+    await StorageService.instance.remove(_rememberedEmailKey);
   }
 
   @override
@@ -60,7 +101,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           message: failure.message,
           status: 'error',
         ),
-        (user) => context.go(AppRoutes.home),
+        (user) async {
+          await _persistRememberMePreference(rememberMe);
+          await _persistRememberedEmail(email);
+
+          if (!context.mounted) return;
+          context.go(AppRoutes.home);
+        },
       );
     }
 
@@ -149,9 +196,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 child: Checkbox(
                                   value: rememberMe,
                                   onChanged: (value) {
+                                    final nextValue = value ?? false;
                                     setState(() {
-                                      rememberMe = value ?? false;
+                                      rememberMe = nextValue;
                                     });
+                                    _persistRememberMePreference(nextValue);
                                   },
                                 ),
                               ),

@@ -80,11 +80,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       (_) async {
         await ref.read(feedProvider.notifier).loadFeed();
         if (!mounted) return;
-        context.pop();
         showGlobalToast(
           message: 'auth.profile_updated'.tr(),
           status: 'success',
         );
+        context.pop();
       },
     );
   }
