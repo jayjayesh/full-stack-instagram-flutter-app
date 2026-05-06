@@ -51,6 +51,47 @@ The project has a working full-stack foundation and now includes profile editing
 
 ## Recent Work
 
+### 2026-05-06 - Delete Confirmation and App-Wide Keyboard Dismiss
+
+What changed:
+
+- Added a confirmation dialog before deleting an owned post so the delete flow now matches the logout confirmation UX.
+- Added translation strings for post deletion confirmation in English and Spanish.
+- Added app-wide keyboard dismissal when tapping outside shared text fields by wiring outside-tap handling into the shared `AppTextField`.
+- Added a root `TapRegionSurface` so the outside-tap keyboard behavior works consistently across screens and sheets that use the shared text field.
+- Added focused widget coverage for the delete confirmation flow and for the shared text field outside-tap callback wiring.
+- Manually verified that keyboard dismiss on outside tap works correctly in the real app flow.
+- Manually verified that the profile-edit flow works correctly, including editing profile data and saving changes successfully.
+- Manually verified that owned-post delete confirmation works correctly in the real app flow.
+- Confirmed that the 3 existing analyzer info warnings in `show_toast.dart` and `theme.dart` can remain out of scope for now.
+
+Files touched:
+
+- `frontend/instagramflutterapp/lib/src/features/posts/presentation/widgets/post_card.dart`
+- `frontend/instagramflutterapp/assets/translations/en.json`
+- `frontend/instagramflutterapp/assets/translations/es.json`
+- `frontend/instagramflutterapp/test/post_card_test.dart`
+- `frontend/instagramflutterapp/lib/src/shared/widgets/app_text_field.dart`
+- `frontend/instagramflutterapp/lib/src/app.dart`
+- `frontend/instagramflutterapp/test/app_text_field_test.dart`
+- `PROGRESS.md`
+
+Tests run:
+
+- `cd frontend/instagramflutterapp && flutter test test/post_card_test.dart`
+  Result: passed.
+- `cd frontend/instagramflutterapp && flutter test test/app_text_field_test.dart test/widget_test.dart`
+  Result: passed.
+- Manual app verification completed for:
+  - keyboard dismiss behavior
+  - profile edit flow
+  - owned-post delete confirmation behavior
+
+Known issues / notes:
+
+- The keyboard-dismiss behavior is implemented through Flutter's `onTapOutside` support on the shared text field plus a root `TapRegionSurface`. Manual verification is complete, but future form screens should continue using the shared `AppTextField` so this behavior stays consistent.
+- The focused keyboard test verifies callback wiring rather than a full synthetic end-to-end focus transition, because Flutter widget tests do not reliably reproduce real outside-tap focus behavior in this case.
+
 ### 2026-05-04 - Progress Refresh and Current Verification Status
 
 What changed:
@@ -213,28 +254,15 @@ The correct API base URL depends on where the Flutter app is running:
 
 Some button, app bar, floating action button, and icon colors may come from Flutter Material 3 theme defaults. When UI colors look unexpected, check the app theme first.
 
-### Analyzer Notes
-
-`flutter analyze` currently reports 3 info-level issues:
-
-- `frontend/instagramflutterapp/lib/src/shared/helpers/show_toast.dart:60`
-- `frontend/instagramflutterapp/lib/src/shared/helpers/show_toast.dart:66`
-- `frontend/instagramflutterapp/lib/src/theme/theme.dart:292`
-
-### Home Page Widget Test Drift
-
-`frontend/instagramflutterapp/test/home_page_test.dart` is currently failing because it still expects the text `Your activity summary`, but `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart` now renders `Your activity`.
-
 ### Environment Files
 
 Do not commit real `.env` files. Keep example files like `.env.example` in Git, but keep local secrets out of Git.
 
 ## Next Recommended Steps
 
-1. Fix the text mismatch between `frontend/instagramflutterapp/test/home_page_test.dart` and `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`, then rerun the focused Flutter tests.
-2. Manually verify the new profile-edit flow on emulator or simulator, especially gallery permissions, image upload, and whether updated avatar/name appear correctly on existing posts after save.
-3. Clean up the 3 current analyzer info warnings in `show_toast.dart` and `theme.dart`.
-4. Consider widget coverage for the new edit-profile screen once the manual flow is verified.
+1. Consider widget coverage for the new edit-profile screen now that the manual flow is verified.
+2. Keep the current progress note in sync whenever new frontend UX changes land, especially around forms, dialogs, and profile-related flows.
+3. When adding future form screens, continue routing editable inputs through the shared `AppTextField` so keyboard dismiss behavior remains app-wide by default.
 
 ## Useful Commands
 
