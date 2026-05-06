@@ -11,6 +11,30 @@ class PostCard extends ConsumerWidget {
 
   final FeedPost post;
 
+  Future<bool> _confirmDelete(BuildContext context) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('posts.delete_post_title'.tr()),
+          content: Text('posts.delete_post_confirmation'.tr()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text('shared.cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('posts.delete_post_action'.tr()),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldDelete ?? false;
+  }
+
   Future<void> _toggleLike(BuildContext context, WidgetRef ref) async {
     final error = await ref.read(feedProvider.notifier).toggleLike(post);
     if (error != null && context.mounted) {
@@ -19,6 +43,9 @@ class PostCard extends ConsumerWidget {
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final shouldDelete = await _confirmDelete(context);
+    if (!shouldDelete) return;
+
     final error = await ref.read(feedProvider.notifier).deletePost(post.id);
     if (error != null && context.mounted) {
       showToast(context, message: error, status: 'error');
@@ -81,7 +108,7 @@ class PostCard extends ConsumerWidget {
                 ),
                 if (post.ownedByMe)
                   IconButton(
-                    tooltip: 'Delete post',
+                    tooltip: 'posts.delete_post_action'.tr(),
                     onPressed: () => _delete(context, ref),
                     icon: const Icon(Icons.delete_outline),
                   ),

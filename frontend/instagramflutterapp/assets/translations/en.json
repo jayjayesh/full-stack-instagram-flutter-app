@@ -16,6 +16,11 @@
     "welcome_home": "Welcome Home!",
     "home_subtitle": "You have successfully completed the onboarding process."
   },
+  "posts": {
+    "delete_post_action": "Delete post",
+    "delete_post_title": "Delete post?",
+    "delete_post_confirmation": "Are you sure you want to delete this post?"
+  },
   "auth": {
     "log_in": "Log in",
     "log_in_subtitle": "Enter your email and password",
