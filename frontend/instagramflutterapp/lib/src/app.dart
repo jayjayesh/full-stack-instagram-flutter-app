@@ -22,6 +22,7 @@ class App extends StatelessWidget {
       locale: context.locale,
       builder: (context, child) {
         Widget current = child!;
+        current = TapRegionSurface(child: current);
         current = SkeletonWrapper(child: current);
         current = SessionListenerWrapper(child: current);
         return current;
