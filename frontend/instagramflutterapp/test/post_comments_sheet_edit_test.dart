@@ -25,10 +25,8 @@ void main() {
     await EasyLocalization.ensureInitialized();
   });
 
-  testWidgets('Owned comment delete action asks for confirmation first',
-      (tester) async {
+  testWidgets('Owned comment can be edited and saved', (tester) async {
     final postsRepository = _StubPostsRepository();
-    final feedNotifier = _TestFeedNotifier();
 
     await tester.pumpWidget(
       EasyLocalization(
@@ -41,7 +39,7 @@ void main() {
               (ref) => _TestSessionNotifier(user: _currentUser),
             ),
             postsRepositoryProvider.overrideWithValue(postsRepository),
-            feedProvider.overrideWith((ref) => feedNotifier),
+            feedProvider.overrideWith((ref) => _TestFeedNotifier()),
             commentsProvider(_postId).overrideWith((ref) async => [_comment]),
           ],
           child: Builder(
@@ -62,33 +60,25 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete comment').last);
+    await tester.tap(find.text('Edit').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('Delete comment?'), findsOneWidget);
-    expect(
-      find.text('Are you sure you want to delete this comment?'),
-      findsOneWidget,
+    final editField = find.byWidgetPredicate(
+      (widget) => widget is EditableText && widget.controller.text == 'Nice shot',
     );
 
-    await tester.tap(find.text('Cancel'));
+    expect(editField, findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Save'), findsOneWidget);
+
+    await tester.enterText(editField, 'Updated comment');
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await tester.pumpAndSettle();
 
-    expect(postsRepository.deletedCommentIds, isEmpty);
-    expect(feedNotifier.decrementedPostIds, isEmpty);
-
-    await tester.tap(find.byIcon(Icons.more_vert));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete comment').last);
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.widgetWithText(FilledButton, 'Delete comment'));
-    await tester.pumpAndSettle();
-
-    expect(postsRepository.deletedCommentIds, ['comment-1']);
-    expect(feedNotifier.decrementedPostIds, [_postId]);
+    expect(postsRepository.updatedComments, [
+      ('comment-1', 'Updated comment'),
+    ]);
   });
-
 }
 
 const _postId = 'post-1';
@@ -118,13 +108,6 @@ class _TestSessionNotifier extends SessionNotifier {
 
 class _TestFeedNotifier extends FeedNotifier {
   _TestFeedNotifier() : super(repository: _StubPostsRepository());
-
-  final List<String> decrementedPostIds = [];
-
-  @override
-  void decrementCommentCount(String postId) {
-    decrementedPostIds.add(postId);
-  }
 
   @override
   Future<void> loadFeed() async {}
@@ -176,7 +159,6 @@ class _StubAuthRepository implements AuthRepository {
 }
 
 class _StubPostsRepository implements PostsRepository {
-  final List<String> deletedCommentIds = [];
   final List<(String, String)> updatedComments = [];
 
   @override
@@ -197,8 +179,7 @@ class _StubPostsRepository implements PostsRepository {
 
   @override
   FutureEither<void> deleteComment(String commentId) async {
-    deletedCommentIds.add(commentId);
-    return right(null);
+    throw UnimplementedError();
   }
 
   @override

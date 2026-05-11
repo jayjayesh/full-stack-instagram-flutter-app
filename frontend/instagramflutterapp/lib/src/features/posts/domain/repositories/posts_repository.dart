@@ -25,5 +25,10 @@ abstract class PostsRepository {
     required String text,
   });
 
+  FutureEither<PostComment> updateComment({
+    required String commentId,
+    required String text,
+  });
+
   FutureEither<void> deleteComment(String commentId);
 }

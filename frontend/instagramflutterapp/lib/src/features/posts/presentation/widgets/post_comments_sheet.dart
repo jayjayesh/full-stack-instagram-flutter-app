@@ -1,4 +1,5 @@
 import 'package:instagramflutterapp/src/features/auth/presentation/providers/session_provider.dart';
+import 'package:instagramflutterapp/src/features/posts/domain/entities/comment.dart';
 import 'package:instagramflutterapp/src/features/posts/presentation/providers/posts_provider.dart';
 import 'package:instagramflutterapp/src/imports/imports.dart';
 
@@ -16,11 +17,18 @@ class PostCommentsSheet extends ConsumerStatefulWidget {
 
 class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
   final _controller = TextEditingController();
+  final _editController = TextEditingController();
   bool _isSending = false;
+  bool _isSavingEdit = false;
+  String? _editingCommentId;
+
+  static const _editCommentAction = 'edit';
+  static const _deleteCommentAction = 'delete';
 
   @override
   void dispose() {
     _controller.dispose();
+    _editController.dispose();
     super.dispose();
   }
 
@@ -86,6 +94,64 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
     return shouldDelete ?? false;
   }
 
+  void _startEditingComment(PostComment comment) {
+    setState(() {
+      _editingCommentId = comment.id;
+      _editController.text = comment.text;
+    });
+  }
+
+  void _cancelEditingComment() {
+    setState(() {
+      _editingCommentId = null;
+      _isSavingEdit = false;
+      _editController.clear();
+    });
+  }
+
+  Future<void> _saveEditedComment(PostComment comment) async {
+    final text = _editController.text.trim();
+    if (text.isEmpty || _isSavingEdit) return;
+
+    if (text == comment.text.trim()) {
+      _cancelEditingComment();
+      return;
+    }
+
+    setState(() => _isSavingEdit = true);
+    final result = await ref.read(postsRepositoryProvider).updateComment(
+          commentId: comment.id,
+          text: text,
+        );
+
+    if (!mounted) return;
+
+    setState(() => _isSavingEdit = false);
+
+    result.fold(
+      (failure) =>
+          showToast(context, message: failure.message, status: 'error'),
+      (_) {
+        _cancelEditingComment();
+        ref.invalidate(commentsProvider(widget.postId));
+      },
+    );
+  }
+
+  Future<void> _handleCommentAction(
+    String action,
+    PostComment comment,
+  ) async {
+    switch (action) {
+      case _editCommentAction:
+        _startEditingComment(comment);
+        break;
+      case _deleteCommentAction:
+        await _deleteComment(comment.id);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final comments = ref.watch(commentsProvider(widget.postId));
@@ -124,7 +190,8 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                     itemBuilder: (context, index) {
                       final comment = items[index];
                       final name = comment.user.name ?? comment.user.email;
-                      final canDelete = comment.user.id == currentUserId;
+                      final isOwner = comment.user.id == currentUserId;
+                      final isEditing = _editingCommentId == comment.id;
 
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
@@ -135,12 +202,76 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        subtitle: Text(comment.text),
-                        trailing: canDelete
-                            ? IconButton(
-                                tooltip: 'posts.delete_comment_action'.tr(),
-                                onPressed: () => _deleteComment(comment.id),
-                                icon: const Icon(Icons.delete_outline),
+                        subtitle: Padding(
+                          padding: EdgeInsets.only(top: AppSpacing.xs),
+                          child: isEditing
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    AppTextField(
+                                      controller: _editController,
+                                      enabled: !_isSavingEdit,
+                                      hint: 'posts.edit_comment_hint'.tr(),
+                                      textInputAction: TextInputAction.done,
+                                      onFieldSubmitted: (_) =>
+                                          _saveEditedComment(comment),
+                                    ),
+                                    SizedBox(height: AppSpacing.xs),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextButton(
+                                          onPressed: _isSavingEdit
+                                              ? null
+                                              : _cancelEditingComment,
+                                          child: Text('shared.cancel'.tr()),
+                                        ),
+                                        SizedBox(width: AppSpacing.xs),
+                                        FilledButton(
+                                          onPressed: _isSavingEdit
+                                              ? null
+                                              : () =>
+                                                  _saveEditedComment(comment),
+                                          child: _isSavingEdit
+                                              ? const SizedBox(
+                                                  width: 18,
+                                                  height: 18,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : Text(
+                                                  'posts.save_comment_action'
+                                                      .tr(),
+                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              : Text(comment.text),
+                        ),
+                        trailing: isOwner && !isEditing
+                            ? PopupMenuButton<String>(
+                                tooltip: 'Comment actions',
+                                onSelected: (value) =>
+                                    _handleCommentAction(value, comment),
+                                itemBuilder: (context) => [
+                                  PopupMenuItem<String>(
+                                    value: _editCommentAction,
+                                    child: Text(
+                                      'posts.edit_comment_action'.tr(),
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: _deleteCommentAction,
+                                    child: Text(
+                                      'posts.delete_comment_action'.tr(),
+                                    ),
+                                  ),
+                                ],
+                                icon: const Icon(Icons.more_vert),
                               )
                             : null,
                       );

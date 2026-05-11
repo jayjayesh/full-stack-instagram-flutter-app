@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Param,
   Post,
   Req,
@@ -20,6 +21,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 const imageStorage = diskStorage({
   destination: './uploads',
@@ -104,5 +106,14 @@ export class PostsController {
   @Delete('comments/:id')
   deleteComment(@CurrentUser() user: JwtUser, @Param('id') commentId: string) {
     return this.postsService.deleteComment(user.id, commentId);
+  }
+
+  @Patch('comments/:id')
+  updateComment(
+    @CurrentUser() user: JwtUser,
+    @Param('id') commentId: string,
+    @Body() dto: UpdateCommentDto,
+  ) {
+    return this.postsService.updateComment(user.id, commentId, dto);
   }
 }

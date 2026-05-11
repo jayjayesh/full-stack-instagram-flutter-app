@@ -232,6 +232,14 @@ class _StubPostsRepository implements PostsRepository {
   }
 
   @override
+  FutureEither<PostComment> updateComment({
+    required String commentId,
+    required String text,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
   FutureEither<void> deletePost(String postId) async {
     throw UnimplementedError();
   }

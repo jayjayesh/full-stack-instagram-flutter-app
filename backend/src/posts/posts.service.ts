@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class PostsService {
@@ -125,6 +126,29 @@ export class PostsService {
 
     await this.prisma.comment.delete({ where: { id: commentId } });
     return { message: 'Comment deleted.' };
+  }
+
+  async updateComment(userId: string, commentId: string, dto: UpdateCommentDto) {
+    const comment = await this.prisma.comment.findUnique({
+      where: { id: commentId },
+      include: { user: true },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comment was not found.');
+    }
+
+    if (comment.userId !== userId) {
+      throw new ForbiddenException('Only the comment owner can edit this comment.');
+    }
+
+    const updatedComment = await this.prisma.comment.update({
+      where: { id: commentId },
+      data: { text: dto.text.trim() },
+      include: { user: true },
+    });
+
+    return { comment: this.toCommentResponse(updatedComment) };
   }
 
   private async ensurePostExists(postId: string) {

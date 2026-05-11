@@ -93,6 +93,21 @@ class PostsRepositoryImpl implements PostsRepository {
     }, requiresNetwork: true);
   }
 
+  @override
+  FutureEither<PostComment> updateComment({
+    required String commentId,
+    required String text,
+  }) {
+    return runTask(() async {
+      final response = await _dio.patch<dynamic>(
+        '/comments/$commentId',
+        data: {'text': text},
+      );
+      final data = response.data as Map<String, dynamic>;
+      return PostCommentModel.fromMap(data['comment'] as Map<String, dynamic>);
+    }, requiresNetwork: true);
+  }
+
   FutureEither<FeedPost> _postAction(String path, {required bool isDelete}) {
     return runTask(() async {
       final response = isDelete

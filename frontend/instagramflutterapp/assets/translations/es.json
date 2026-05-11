@@ -20,6 +20,9 @@
     "delete_post_action": "Eliminar publicacion",
     "delete_post_title": "Eliminar publicacion?",
     "delete_post_confirmation": "Estas seguro de que quieres eliminar esta publicacion?",
+    "edit_comment_action": "Editar",
+    "edit_comment_hint": "Edita tu comentario",
+    "save_comment_action": "Guardar",
     "delete_comment_action": "Eliminar comentario",
     "delete_comment_title": "Eliminar comentario?",
     "delete_comment_confirmation": "Estas seguro de que quieres eliminar este comentario?"
