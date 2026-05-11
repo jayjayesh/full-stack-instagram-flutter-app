@@ -11,6 +11,18 @@ class PostCard extends ConsumerWidget {
 
   final FeedPost post;
 
+  String _commentButtonLabel() {
+    if (post.commentCount == 0) {
+      return 'Leave a comment';
+    }
+
+    if (post.commentCount == 1) {
+      return 'View 1 comment';
+    }
+
+    return 'View ${post.commentCount} comments';
+  }
+
   Future<bool> _confirmDelete(BuildContext context) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
@@ -186,7 +198,7 @@ class PostCard extends ConsumerWidget {
                 ],
                 TextButton(
                   onPressed: () => _openComments(context),
-                  child: Text('View ${post.commentCount} comments'),
+                  child: Text(_commentButtonLabel()),
                 ),
               ],
             ),

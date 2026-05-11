@@ -25,12 +25,7 @@ void main() {
     await EasyLocalization.ensureInitialized();
   });
 
-  testWidgets('Owned post delete action asks for confirmation first',
-      (tester) async {
-    final feedNotifier = _TestFeedNotifier(
-      state: FeedState(posts: [_ownedPost]),
-    );
-
+  testWidgets('Zero comment count shows leave a comment CTA', (tester) async {
     await tester.pumpWidget(
       EasyLocalization(
         supportedLocales: const [Locale('en'), Locale('es')],
@@ -39,9 +34,13 @@ void main() {
         child: ProviderScope(
           overrides: [
             sessionProvider.overrideWith(
-              (ref) => _TestSessionNotifier(user: _ownedPost.author),
+              (ref) => _TestSessionNotifier(user: _zeroCommentPost.author),
             ),
-            feedProvider.overrideWith((ref) => feedNotifier),
+            feedProvider.overrideWith(
+              (ref) => _TestFeedNotifier(
+                state: FeedState(posts: [_zeroCommentPost]),
+              ),
+            ),
           ],
           child: Builder(
             builder: (context) => MaterialApp(
@@ -50,7 +49,7 @@ void main() {
               localizationsDelegates: context.localizationDelegates,
               home: Scaffold(
                 body: SingleChildScrollView(
-                  child: PostCard(post: _ownedPost),
+                  child: PostCard(post: _zeroCommentPost),
                 ),
               ),
             ),
@@ -60,46 +59,30 @@ void main() {
     );
 
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
-    await tester.tap(find.byTooltip('Delete post'));
-    await tester.pump();
+    final allText =
+        tester.allWidgets.whereType<Text>().map((text) => text.data).toList();
 
-    expect(find.text('Delete post?'), findsOneWidget);
-    expect(
-      find.text('Are you sure you want to delete this post?'),
-      findsOneWidget,
-    );
-
-    await tester.tap(find.text('Cancel'));
-    await tester.pump();
-
-    expect(feedNotifier.deletedPostIds, isEmpty);
-
-    await tester.tap(find.byTooltip('Delete post'));
-    await tester.pump();
-
-    await tester.tap(find.widgetWithText(FilledButton, 'Delete post'));
-    await tester.pump();
-
-    expect(feedNotifier.deletedPostIds, ['post-1']);
+    expect(allText, contains('Leave a comment'));
+    expect(allText, isNot(contains('View 0 comments')));
   });
-
 }
 
-final _ownedPost = FeedPost(
-  id: 'post-1',
-  imageUrl: 'https://example.com/photo.jpg',
-  caption: 'Sunset walk',
+final _zeroCommentPost = FeedPost(
+  id: 'post-2',
+  imageUrl: 'https://example.com/food.jpg',
+  caption: 'Gujarati thali preparation',
   author: const AppUser(
-    id: 'user-1',
-    name: 'Jordan Lee',
-    email: 'jordan@example.com',
+    id: 'user-2',
+    name: 'Student',
+    email: 'student@example.com',
   ),
-  likeCount: 4,
-  commentCount: 2,
+  likeCount: 2,
+  commentCount: 0,
   likedByMe: false,
-  ownedByMe: true,
-  createdAt: DateTime(2026, 5, 6),
+  ownedByMe: false,
+  createdAt: DateTime(2026, 5, 11),
 );
 
 class _TestSessionNotifier extends SessionNotifier {
@@ -116,17 +99,6 @@ class _TestFeedNotifier extends FeedNotifier {
   _TestFeedNotifier({required FeedState state})
       : super(repository: _StubPostsRepository()) {
     this.state = state;
-  }
-
-  final List<String> deletedPostIds = [];
-
-  @override
-  Future<String?> deletePost(String postId) async {
-    deletedPostIds.add(postId);
-    state = state.copyWith(
-      posts: state.posts.where((post) => post.id != postId).toList(),
-    );
-    return null;
   }
 
   @override
