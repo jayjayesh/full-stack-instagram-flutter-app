@@ -51,6 +51,31 @@ The project has a working full-stack foundation and now includes profile editing
 
 ## Recent Work
 
+### 2026-05-11 - GitHub Actions Flutter CI for `production`
+
+What changed:
+
+- Added a GitHub Actions workflow at `.github/workflows/flutter-ci.yml` for the Flutter app.
+- Configured the workflow to run only on pushes to `production` and pull requests targeting `production`.
+- Kept the workflow intentionally focused on frontend validation by running `flutter pub get`, `flutter analyze --no-fatal-infos`, and `flutter test` from `frontend/instagramflutterapp`.
+- Added a small CI safeguard that creates `.env` from `.env.example` only when the runner does not already have a tracked `.env` file available.
+
+Files touched:
+
+- `.github/workflows/flutter-ci.yml`
+- `PROGRESS.md`
+
+Tests run:
+
+- `cd frontend/instagramflutterapp && flutter analyze`
+  Result: completed with 8 info-level lints, including the previously known `show_toast.dart` and `theme.dart` items plus several test-file `prefer_const_constructors` infos. Because these are info-level only, the CI workflow now uses `--no-fatal-infos` so they do not block adoption of the first pipeline.
+- `cd frontend/instagramflutterapp && flutter test`
+  Result: could not complete locally on this machine because Flutter failed while deleting `ios/Flutter/ephemeral/Packages/.packages`, reporting a read-only volume style filesystem error before test execution. This appears to be a local environment issue rather than a GitHub-hosted runner requirement for the workflow.
+
+Known issues / notes:
+
+- The repository currently has `main` as the only existing branch. The workflow will stay dormant until a real `production` branch is created on GitHub or locally and pushed.
+
 ### 2026-05-06 - Delete Confirmation and App-Wide Keyboard Dismiss
 
 What changed:
