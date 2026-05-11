@@ -47,6 +47,9 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
   }
 
   Future<void> _deleteComment(String commentId) async {
+    final shouldDelete = await _confirmDeleteComment();
+    if (!shouldDelete) return;
+
     final result =
         await ref.read(postsRepositoryProvider).deleteComment(commentId);
     result.fold(
@@ -57,6 +60,30 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
         ref.read(feedProvider.notifier).decrementCommentCount(widget.postId);
       },
     );
+  }
+
+  Future<bool> _confirmDeleteComment() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('posts.delete_comment_title'.tr()),
+          content: Text('posts.delete_comment_confirmation'.tr()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text('shared.cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('posts.delete_comment_action'.tr()),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldDelete ?? false;
   }
 
   @override
@@ -111,7 +138,7 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                         subtitle: Text(comment.text),
                         trailing: canDelete
                             ? IconButton(
-                                tooltip: 'Delete comment',
+                                tooltip: 'posts.delete_comment_action'.tr(),
                                 onPressed: () => _deleteComment(comment.id),
                                 icon: const Icon(Icons.delete_outline),
                               )
