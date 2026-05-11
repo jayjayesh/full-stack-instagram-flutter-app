@@ -14,7 +14,7 @@ The app uses:
 
 ## Current Status
 
-The project has a working full-stack foundation and now includes profile editing support for the signed-in user. Users can open an edit-profile screen from the home profile card, change their display name, upload a new profile photo, and see the session and feed refresh after saving.
+The project has a working full-stack foundation and now includes profile editing plus a more complete comment experience. Users can edit their profile, confirm comment deletion before it happens, edit their own comments, and see post comment labels adapt to the current comment count.
 
 ## Completed So Far
 
@@ -51,30 +51,26 @@ The project has a working full-stack foundation and now includes profile editing
 
 ## Recent Work
 
-### 2026-05-11 - GitHub Actions Flutter CI for `production`
+### 2026-05-11 - Comment Management UX, Comment Editing, and Flutter CI
 
 What changed:
 
+- Added a delete-comment confirmation dialog in the post comments sheet so comment removal now matches the safer confirmation pattern already used for logout and post deletion.
+- Updated the post comment CTA so the label changes with the current comment count instead of always showing a single static message.
+- Added backend comment editing support with a new update-comment DTO plus controller and service handling.
+- Connected the Flutter post repository and comments sheet UI to the new edit-comment API flow.
+- Added widget coverage for comment deletion confirmation, comment-count label behavior, and editing an owned comment.
 - Added a GitHub Actions workflow at `.github/workflows/flutter-ci.yml` for the Flutter app.
-- Configured the workflow to run only on pushes to `production` and pull requests targeting `production`.
-- Kept the workflow intentionally focused on frontend validation by running `flutter pub get`, `flutter analyze --no-fatal-infos`, and `flutter test` from `frontend/instagramflutterapp`.
+- Configured the workflow to run on pushes to `production` and pull requests targeting `production`.
+- Kept the workflow focused on frontend validation by running `flutter pub get`, `flutter analyze --no-fatal-infos`, and `flutter test` from `frontend/instagramflutterapp`.
 - Added a small CI safeguard that creates `.env` from `.env.example` only when the runner does not already have a tracked `.env` file available.
-
-Files touched:
-
-- `.github/workflows/flutter-ci.yml`
-- `PROGRESS.md`
-
-Tests run:
-
-- `cd frontend/instagramflutterapp && flutter analyze`
-  Result: completed with 8 info-level lints, including the previously known `show_toast.dart` and `theme.dart` items plus several test-file `prefer_const_constructors` infos. Because these are info-level only, the CI workflow now uses `--no-fatal-infos` so they do not block adoption of the first pipeline.
-- `cd frontend/instagramflutterapp && flutter test`
-  Result: could not complete locally on this machine because Flutter failed while deleting `ios/Flutter/ephemeral/Packages/.packages`, reporting a read-only volume style filesystem error before test execution. This appears to be a local environment issue rather than a GitHub-hosted runner requirement for the workflow.
+- Added `AGENTS.md` so future agents have a project-specific guide for the repo structure, stack, workflow expectations, and current priority.
 
 Known issues / notes:
 
-- The repository currently has `main` as the only existing branch. The workflow will stay dormant until a real `production` branch is created on GitHub or locally and pushed.
+- The repository currently has `main` as the only existing branch. The new workflow will stay dormant until a real `production` branch exists on GitHub or locally and is pushed.
+- `flutter analyze` currently reports 8 info-level lints. Three are older style items in app code, and five are `prefer_const_constructors` infos in widget tests.
+- The highest-value remaining gap is still edit-profile widget coverage. That flow has manual verification, but it does not yet have dedicated automated widget tests.
 
 ### 2026-05-06 - Delete Confirmation and App-Wide Keyboard Dismiss
 
@@ -90,28 +86,6 @@ What changed:
 - Manually verified that owned-post delete confirmation works correctly in the real app flow.
 - Confirmed that the 3 existing analyzer info warnings in `show_toast.dart` and `theme.dart` can remain out of scope for now.
 
-Files touched:
-
-- `frontend/instagramflutterapp/lib/src/features/posts/presentation/widgets/post_card.dart`
-- `frontend/instagramflutterapp/assets/translations/en.json`
-- `frontend/instagramflutterapp/assets/translations/es.json`
-- `frontend/instagramflutterapp/test/post_card_test.dart`
-- `frontend/instagramflutterapp/lib/src/shared/widgets/app_text_field.dart`
-- `frontend/instagramflutterapp/lib/src/app.dart`
-- `frontend/instagramflutterapp/test/app_text_field_test.dart`
-- `PROGRESS.md`
-
-Tests run:
-
-- `cd frontend/instagramflutterapp && flutter test test/post_card_test.dart`
-  Result: passed.
-- `cd frontend/instagramflutterapp && flutter test test/app_text_field_test.dart test/widget_test.dart`
-  Result: passed.
-- Manual app verification completed for:
-  - keyboard dismiss behavior
-  - profile edit flow
-  - owned-post delete confirmation behavior
-
 Known issues / notes:
 
 - The keyboard-dismiss behavior is implemented through Flutter's `onTapOutside` support on the shared text field plus a root `TapRegionSurface`. Manual verification is complete, but future form screens should continue using the shared `AppTextField` so this behavior stays consistent.
@@ -125,26 +99,6 @@ What changed:
 - Re-ran the focused frontend checks and backend build to confirm the current verification status instead of relying only on the previous summary.
 - Found that the home-page widget test is now out of sync with the UI copy. The test still expects `Your activity summary`, while the widget currently renders `Your activity`.
 
-Files touched:
-
-- `PROGRESS.md`
-- `frontend/instagramflutterapp/test/home_page_test.dart`
-- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`
-
-Tests run:
-
-- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart -r expanded`
-  Result: passed.
-- `cd frontend/instagramflutterapp && flutter test test/home_page_test.dart -r expanded`
-  Result: failed. The test expected `Your activity summary`, but no matching widget was found.
-- `cd frontend/instagramflutterapp && flutter analyze`
-  Result: completed with 3 info-level lints:
-  - `lib/src/shared/helpers/show_toast.dart:60`
-  - `lib/src/shared/helpers/show_toast.dart:66`
-  - `lib/src/theme/theme.dart:292`
-- `cd backend && npm run build`
-  Result: passed.
-
 ### 2026-05-01 - Home Profile, Logout UX, and Session-Aware Feed
 
 What changed:
@@ -156,29 +110,6 @@ What changed:
 - Added a focused Riverpod regression test to verify the feed clears and reloads for the next signed-in user.
 - Cleaned up a small unnecessary home-page item in the latest commit.
 
-Files touched:
-
-- `frontend/instagramflutterapp/lib/src/features/home/presentation/screens/home_page.dart`
-- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`
-- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_stat_card.dart`
-- `frontend/instagramflutterapp/lib/src/features/posts/presentation/providers/posts_provider.dart`
-- `frontend/instagramflutterapp/lib/src/features/posts/presentation/screens/create_post_screen.dart`
-- `frontend/instagramflutterapp/lib/src/shared/widgets/app_text_field.dart`
-- `frontend/instagramflutterapp/lib/src/theme/theme.dart`
-- `frontend/instagramflutterapp/assets/translations/en.json`
-- `frontend/instagramflutterapp/assets/translations/es.json`
-- `frontend/instagramflutterapp/test/feed_provider_test.dart`
-
-Tests run:
-
-- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart`
-  Result: passed.
-- `cd frontend/instagramflutterapp && flutter analyze`
-  Result: completed with 3 info-level lints:
-  - `lib/src/shared/helpers/show_toast.dart:60`
-  - `lib/src/shared/helpers/show_toast.dart:66`
-  - `lib/src/theme/theme.dart:292`
-
 ### 2026-05-04 - Manual Verification Complete and Home Widget Tests
 
 What changed:
@@ -187,23 +118,6 @@ What changed:
 - Confirmed the home profile card updates correctly in the real app flow.
 - Added widget tests for the home page profile summary content.
 - Added widget coverage for the logout confirmation dialog, including cancel and confirm behavior with navigation to the login route.
-
-Files touched:
-
-- `frontend/instagramflutterapp/test/home_page_test.dart`
-- `PROGRESS.md`
-
-Tests run:
-
-- `cd frontend/instagramflutterapp && flutter test test/home_page_test.dart`
-  Result: passed.
-- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart`
-  Result: passed.
-- `cd frontend/instagramflutterapp && flutter analyze`
-  Result: completed with 3 info-level lints:
-  - `lib/src/shared/helpers/show_toast.dart:60`
-  - `lib/src/shared/helpers/show_toast.dart:66`
-  - `lib/src/theme/theme.dart:292`
 
 ### 2026-05-04 - Profile Editing and Profile Photo Upload
 
@@ -217,41 +131,6 @@ What changed:
 - Refreshed the feed after a successful profile update so the user's posts pick up the latest name and photo without requiring a full sign-out/sign-in cycle.
 - Added translation strings for the new profile-editing flow.
 - Updated test doubles to match the new auth repository contract.
-
-Files touched:
-
-- `backend/src/auth/auth.controller.ts`
-- `backend/src/auth/auth.service.ts`
-- `backend/src/auth/dto/update-profile.dto.ts`
-- `frontend/instagramflutterapp/lib/src/services/auth_service.dart`
-- `frontend/instagramflutterapp/lib/src/features/auth/domain/repositories/auth_repository.dart`
-- `frontend/instagramflutterapp/lib/src/features/auth/data/repositories/auth_repository_impl.dart`
-- `frontend/instagramflutterapp/lib/src/features/auth/presentation/providers/auth_provider.dart`
-- `frontend/instagramflutterapp/lib/src/features/auth/presentation/screens/edit_profile_screen.dart`
-- `frontend/instagramflutterapp/lib/src/features/home/presentation/screens/home_page.dart`
-- `frontend/instagramflutterapp/lib/src/features/home/presentation/widgets/profile_section_card.dart`
-- `frontend/instagramflutterapp/lib/src/routing/app_router.dart`
-- `frontend/instagramflutterapp/lib/src/routing/app_routes.dart`
-- `frontend/instagramflutterapp/lib/src/imports/core_imports.dart`
-- `frontend/instagramflutterapp/assets/translations/en.json`
-- `frontend/instagramflutterapp/assets/translations/es.json`
-- `frontend/instagramflutterapp/test/home_page_test.dart`
-- `frontend/instagramflutterapp/test/feed_provider_test.dart`
-- `PROGRESS.md`
-
-Tests run:
-
-- `cd frontend/instagramflutterapp && flutter test test/home_page_test.dart -r expanded`
-  Result: passed.
-- `cd frontend/instagramflutterapp && flutter test test/feed_provider_test.dart -r expanded`
-  Result: passed.
-- `cd frontend/instagramflutterapp && flutter analyze`
-  Result: completed with 3 existing info-level lints:
-  - `lib/src/shared/helpers/show_toast.dart:60`
-  - `lib/src/shared/helpers/show_toast.dart:66`
-  - `lib/src/theme/theme.dart:292`
-- `cd backend && npm run build`
-  Result: passed.
 
 ## Known Issues And Watch Points
 
@@ -285,49 +164,9 @@ Do not commit real `.env` files. Keep example files like `.env.example` in Git, 
 
 ## Next Recommended Steps
 
-1. Consider widget coverage for the new edit-profile screen now that the manual flow is verified.
-2. Keep the current progress note in sync whenever new frontend UX changes land, especially around forms, dialogs, and profile-related flows.
-3. When adding future form screens, continue routing editable inputs through the shared `AppTextField` so keyboard dismiss behavior remains app-wide by default.
-
-## Useful Commands
-
-### Check Git Changes
-
-```bash
-git status --short
-git diff --stat
-```
-
-### Start Backend
-
-```bash
-cd backend
-npm run start:dev
-```
-
-### Start Flutter App
-
-```bash
-cd frontend/instagramflutterapp
-flutter pub get
-flutter run
-```
-
-### Flutter Checks
-
-```bash
-cd frontend/instagramflutterapp
-flutter analyze
-flutter test
-```
-
-### Backend Checks
-
-```bash
-cd backend
-npm run lint
-npm test
-```
+1. Add focused widget coverage for the edit-profile flow so the recent profile screen, save action, validation, and refresh behavior are protected by automated tests instead of only manual verification.
+2. After the edit-profile tests land, consider a focused backend or integration-style check for comment editing so both the new DTO validation and frontend repository flow stay aligned.
+3. Keep routing future editable form inputs through the shared `AppTextField` so keyboard-dismiss behavior remains app-wide by default.
 
 ## How To Use This File With Codex
 
