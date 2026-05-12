@@ -12,6 +12,7 @@ jobs:
   flutter-validate:
     name: Flutter Validate
     runs-on: ubuntu-latest
+    environment: Production
     defaults:
       run:
         working-directory: frontend/instagramflutterapp
@@ -23,15 +24,12 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.27.4
+          flutter-version: 3.38.9
           channel: stable
           cache: true
 
-      - name: Ensure app environment file exists
-        run: |
-          if [ ! -f .env ]; then
-            cp .env.example .env
-          fi
+      - name: Create app environment file
+        run: echo "API_BASE_URL=${{ vars.API_BASE_URL }}" > .env
 
       - name: Install Flutter dependencies
         run: flutter pub get
