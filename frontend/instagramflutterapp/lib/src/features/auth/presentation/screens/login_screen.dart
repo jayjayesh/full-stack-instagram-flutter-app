@@ -17,6 +17,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   late GlobalKey<FormState> formKey;
   late TextEditingController emailController;
   late TextEditingController passwordController;
+  late FocusNode passwordFocusNode;
   bool obscurePassword = true;
   bool rememberMe = true;
   final showSocialMediaSignin = false;
@@ -27,6 +28,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     formKey = GlobalKey<FormState>();
     emailController = TextEditingController();
     passwordController = TextEditingController();
+    passwordFocusNode = FocusNode();
     _loadRememberedLogin();
   }
 
@@ -34,6 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+    passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -142,6 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         enabled: !isLoading,
                         label: 'auth.email'.tr(),
                         prefixIcon: const Icon(Icons.email_outlined),
+                        textInputAction: TextInputAction.next,
                         validator: (v) {
                           final email = v?.trim();
 
@@ -153,10 +157,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           }
                           return null;
                         },
+                        onFieldSubmitted: (value) {
+                          passwordFocusNode.requestFocus();
+                        },
                       ),
                       SizedBox(height: AppSpacing.md),
                       AppTextField(
                         controller: passwordController,
+                        focusNode: passwordFocusNode,
+                        textInputAction: TextInputAction.done,
                         enabled: !isLoading,
                         label: 'auth.password'.tr(),
                         obscureText: obscurePassword,
