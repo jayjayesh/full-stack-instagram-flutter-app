@@ -16,6 +16,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
+  late FocusNode emailFocusNode;
+  late FocusNode passwordFocusNode;
+  late FocusNode confirmPasswordFocusNode;
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
   final showSocialMediaSignin = false;
@@ -28,6 +31,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     emailController = TextEditingController();
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
+    emailFocusNode = FocusNode();
+    passwordFocusNode = FocusNode();
+    confirmPasswordFocusNode = FocusNode();
   }
 
   @override
@@ -36,6 +42,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+    confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
@@ -102,17 +111,23 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         enabled: !isLoading,
                         label: 'auth.name'.tr(),
                         prefixIcon: const Icon(Icons.person_outline),
+                        textInputAction: TextInputAction.next,
                         validator: (v) => AppUtils.isBlank(v?.trim())
                             ? 'auth.name_required'.tr()
                             : null,
+                        onFieldSubmitted: (value) {
+                          emailFocusNode.requestFocus();
+                        },
                       ),
                       SizedBox(height: AppSpacing.md),
                       AppTextField(
                         controller: emailController,
+                        focusNode: emailFocusNode,
                         enabled: !isLoading,
                         keyboardType: TextInputType.emailAddress,
                         label: 'auth.email'.tr(),
                         prefixIcon: const Icon(Icons.email_outlined),
+                        textInputAction: TextInputAction.next,
                         validator: (v) {
                           final email = v?.trim();
 
@@ -124,13 +139,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           }
                           return null;
                         },
+                        onFieldSubmitted: (value) {
+                          passwordFocusNode.requestFocus();
+                        },
                       ),
                       SizedBox(height: AppSpacing.md),
                       AppTextField(
                         controller: passwordController,
+                        focusNode: passwordFocusNode,
                         enabled: !isLoading,
                         label: 'auth.password'.tr(),
                         obscureText: obscurePassword,
+                        textInputAction: TextInputAction.next,
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -153,13 +173,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           }
                           return null;
                         },
+                        onFieldSubmitted: (value) {
+                          confirmPasswordFocusNode.requestFocus();
+                        },
                       ),
                       SizedBox(height: AppSpacing.md),
                       AppTextField(
                         controller: confirmPasswordController,
+                        focusNode: confirmPasswordFocusNode,
                         enabled: !isLoading,
                         label: 'auth.confirm_password'.tr(),
                         obscureText: obscureConfirmPassword,
+                        textInputAction: TextInputAction.done,
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
