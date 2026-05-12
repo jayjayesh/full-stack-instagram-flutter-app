@@ -2,11 +2,9 @@ name: Build and Deploy Android App
 
 on:
   push:
-    branches:
-      - production
-  pull_request:
-    branches:
-      - production
+    tags:
+      - "v*"
+  workflow_dispatch:
 
 permissions:
   contents: write

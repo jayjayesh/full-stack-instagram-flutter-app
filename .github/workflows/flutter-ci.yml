@@ -3,10 +3,10 @@ name: Flutter CI
 on:
   push:
     branches:
-      - production
+      - main
   pull_request:
     branches:
-      - production
+      - main
 
 jobs:
   flutter-validate:
