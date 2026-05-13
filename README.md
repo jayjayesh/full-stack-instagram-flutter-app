@@ -2,6 +2,15 @@
 
 This repository contains a photo-focused Instagram clone built with a Flutter frontend and a NestJS backend. It is structured as both a working full-stack app and a beginner-friendly learning project, with supporting guides in [`docs/`](docs).
 
+## Core Features
+
+- User signup, login, and current-user auth flow with JWT
+- Photo uploads with optional captions
+- Feed retrieval with author, likes, comments, and liked-state
+- Like and unlike posts
+- Add update delete post/comments
+- Native share flow on the Flutter side
+
 ## Stack
 
 - Frontend: Flutter, Riverpod, GoRouter, Dio
@@ -68,80 +77,6 @@ After running the backend seed:
 
 - Email: `student@example.com`
 - Password: `password123`
-
-## Core Features
-
-- User signup, login, and current-user auth flow with JWT
-- Photo uploads with optional captions
-- Feed retrieval with author, likes, comments, and liked-state
-- Like and unlike posts
-- Add and delete comments
-- Delete your own posts and comments
-- Native share flow on the Flutter side
-
-## Request Flow
-
-### Backend
-
-1. Controller receives the request.
-2. DTO validation checks the payload.
-3. JWT guards protect authenticated routes.
-4. Service runs business logic.
-5. Prisma reads or writes PostgreSQL.
-6. JSON response is returned to Flutter.
-
-### Frontend
-
-1. Screen collects user input.
-2. Riverpod provider calls a repository.
-3. Repository uses Dio to call the backend.
-4. JWT is attached to protected requests.
-5. Provider updates UI state.
-6. Widgets rebuild with the latest data.
-
-## Important Code Areas
-
-### Backend
-
-- `backend/src/auth`: signup, login, JWT, current user
-- `backend/src/posts`: posts, likes, comments, uploads
-- `backend/prisma/schema.prisma`: data model and relationships
-
-### Frontend
-
-- `frontend/instagramflutterapp/lib/src/services/auth_service.dart`: auth API calls
-- `frontend/instagramflutterapp/lib/src/config/app_config.dart`: Dio and app config
-- `frontend/instagramflutterapp/lib/src/features/posts`: feed, upload, likes, comments, share
-- `frontend/instagramflutterapp/lib/src/features/home/presentation/screens/home_page.dart`: main feed screen
-
-## API Overview
-
-Base path: `/api`
-
-### Auth
-
-- `POST /auth/signup`
-- `POST /auth/login`
-- `GET /auth/me`
-
-### Posts
-
-- `POST /posts`
-- `GET /posts/feed`
-- `DELETE /posts/:id`
-
-### Likes
-
-- `POST /posts/:id/like`
-- `DELETE /posts/:id/like`
-
-### Comments
-
-- `GET /posts/:id/comments`
-- `POST /posts/:id/comments`
-- `DELETE /comments/:id`
-
-See [`docs/API.md`](docs/API.md) for example request bodies and auth details.
 
 ## Docs Guide
 
